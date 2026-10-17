@@ -89,6 +89,10 @@ describe("pronouns", () => {
   const lizz = CHARACTERS.find((c) => c.id === "lizz")!;
   const rocha = CHARACTERS.find((c) => c.id === "rocha")!;
 
+  it("default pronouns: Lizz they/them, everyone else she/her", () => {
+    for (const c of CHARACTERS) expect(c.pronouns.subject, c.id).toBe(c.id === "lizz" ? "they" : "she");
+  });
+
   it("Lizz uses they/them everywhere", () => {
     expect(lizz.pronouns).toEqual({ subject: "they", object: "them", possessive: "their", plural: true });
     const t = "{name} {has} consumed {their} strawberry iced matcha and {is} now accepting compliments.";

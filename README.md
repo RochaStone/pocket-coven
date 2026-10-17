@@ -21,8 +21,8 @@ with a persistent Tamagotchi-style character, wardrobe, room and pearl purse.
 | Multiplayer | Realtime presence, chat, stickers, floating reactions, live roster (mood, location, activity, outfit), activity invitations, "friends nearby" social bonus, and two shared ceremonies (Moon Ritual, Group Sound Bath) where every participant is rewarded. |
 | Owner | `/admin`: invites (create, share sheet, copy, revoke), claimed status, edit witch text and pronouns, reset or release a witch, gift pearls, moderate chat, edit game config, edit shop prices. |
 
-Lizz uses they/them everywhere. Dray, Cheryl and Veda also default to they/them until they set their own
-pronouns (Wardrobe → Profile), because their pronouns were not specified. Rocha uses she/her.
+Lizz uses they/them everywhere. Rocha, Dray, Cheryl and Veda use she/her. Anyone can change their own
+pronouns later in Wardrobe → Profile.
 Flavour text is templated so no line assumes a gender, and a unit test fails if one does.
 
 The baby-aesthetic rule is enforced server-side: adult-themed activities (champagne toast, balcony gossip
