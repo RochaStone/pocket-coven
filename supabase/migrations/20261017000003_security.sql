@@ -106,7 +106,9 @@ begin
   if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
     foreach t in array array['chat_messages','character_status','character_stats','equipment','shared_events',
                              'shared_event_participants','rooms','room_decorations','characters'] loop
-      execute format('alter publication supabase_realtime add table public.%I', t);
+      if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = t) then
+        execute format('alter publication supabase_realtime add table public.%I', t);
+      end if;
     end loop;
   end if;
 end $$;
@@ -116,6 +118,8 @@ end $$;
 do $$
 begin
   if exists (select 1 from pg_tables where schemaname = 'realtime' and tablename = 'messages') then
+    execute 'drop policy if exists "coven members use coven channel" on realtime.messages';
+    execute 'drop policy if exists "coven members send on coven channel" on realtime.messages';
     execute $p$
       create policy "coven members use coven channel" on realtime.messages
       for select to authenticated
