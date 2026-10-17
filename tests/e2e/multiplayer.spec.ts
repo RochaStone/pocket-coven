@@ -4,33 +4,16 @@ import { mkdirSync } from "node:fs";
 
 // Requires: local Supabase running (`npx supabase start`), freshly reset (`npx supabase db reset`),
 // and the app running on E2E_BASE_URL with .env.local pointing at it.
-const MAILPIT = process.env.MAILPIT_URL ?? "http://127.0.0.1:54324";
 const SHOTS = "screenshots/e2e";
 mkdirSync(SHOTS, { recursive: true });
 const shot = (page: Page, name: string) => page.screenshot({ path: `${SHOTS}/${name}.png`, fullPage: false });
 
-async function latestCode(email: string, after: number): Promise<string> {
-  for (let i = 0; i < 40; i++) {
-    const res = await fetch(`${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:${email}`)}`);
-    const data = (await res.json()) as { messages: { ID: string; Created: string }[] };
-    const msg = data.messages?.find((m) => new Date(m.Created).getTime() >= after - 2000);
-    if (msg) {
-      const full = (await (await fetch(`${MAILPIT}/api/v1/message/${msg.ID}`)).json()) as { Text: string; HTML: string };
-      const code = (full.Text || full.HTML).match(/\b(\d{6})\b/)?.[1];
-      if (code) return code;
-    }
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  throw new Error(`no code email for ${email}`);
-}
+const PASSWORD = "seashell-magic-42";
 
-async function signIn(page: Page, email: string) {
-  const t = Date.now();
-  await page.getByLabel("Your email").fill(email);
-  await page.getByRole("button", { name: /send my magic link/i }).click();
-  const code = await latestCode(email, t);
-  await page.getByLabel("Code from the email").fill(code);
-  await page.getByRole("button", { name: /enter the coven/i }).click();
+async function createLogin(page: Page, email: string) {
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel(/choose a password/i).fill(PASSWORD);
+  await page.getByRole("button", { name: /create my login/i }).click();
 }
 
 async function claimViaInvite(browser: Browser, url: string, email: string, name: string) {
@@ -42,8 +25,7 @@ async function claimViaInvite(browser: Browser, url: string, email: string, name
   page.on("response", (r) => r.status() >= 400 && errors.push(`${r.status()} ${r.url()}`));
   await page.goto(url);
   await expect(page.getByRole("heading", { name })).toBeVisible();
-  await signIn(page, email);
-  await page.getByRole("button", { name: `Claim ${name}` }).click();
+  await createLogin(page, email);
   await page.waitForURL("**/play");
   return { ctx, page, errors };
 }
@@ -90,6 +72,19 @@ test("five-witch coven core loop: invites, claims, chat, presence, shared ritual
   await tp.goto(lizzUrl);
   await expect(tp.getByText(/already been claimed/i)).toBeVisible();
   await thief.close();
+
+  // 3b. A returning witch signs in from a fresh device with email + password.
+  const again = await browser.newContext();
+  const ap = await again.newPage();
+  await ap.goto("/");
+  await ap.getByRole("button", { name: "Open the seashell" }).click({ force: true });
+  await ap.getByRole("button", { name: /enter the coven/i }).click();
+  await ap.getByLabel("Email").fill("lizz@coven.test");
+  await ap.getByLabel("Password").fill(PASSWORD);
+  await ap.getByRole("button", { name: /enter the coven/i }).click();
+  await ap.waitForURL("**/play");
+  await expect(ap.getByText("The Lesbian Witch").first()).toBeVisible();
+  await again.close();
 
   // 4. Presence + chat across devices, in the Coven Lounge.
   await goToLocation(rocha.page, /coven lounge/i);

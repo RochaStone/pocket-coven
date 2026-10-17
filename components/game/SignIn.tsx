@@ -1,82 +1,85 @@
 "use client";
 import { useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase/client";
-import { SITE_URL } from "@/lib/supabase/env";
+import { FUNCTIONS_URL, SUPABASE_ANON_KEY } from "@/lib/supabase/env";
 
-// Email magic link plus 6-digit code. The code path works even when the email
-// opens in a different browser (common on phones), where PKCE links cannot.
-export function SignIn({ next, onSignedIn }: { next: string; onSignedIn: () => void }) {
+const field =
+  "rounded-full border-2 border-shell-200 bg-white px-4 py-2.5 text-[16px] outline-none focus:border-shell-400";
+
+// Email + password. With an invite token, "create" mode first makes a confirmed account
+// via the claim-account edge function (no email round trip), then signs in.
+export function SignIn({ onSignedIn, inviteToken }: { onSignedIn: () => void; inviteToken?: string }) {
+  const [mode, setMode] = useState<"create" | "signin">(inviteToken ? "create" : "signin");
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [stage, setStage] = useState<"email" | "code">("email");
+  const [password, setPassword] = useState("");
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const supabase = supabaseBrowser();
 
-  const sendLink = async (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setWorking(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: { emailRedirectTo: `${SITE_URL}/auth/callback?next=${encodeURIComponent(next)}`, shouldCreateUser: true },
-    });
-    setWorking(false);
-    if (error) setError(error.message);
-    else setStage("code");
+    try {
+      if (mode === "create" && inviteToken) {
+        const res = await fetch(`${FUNCTIONS_URL}/claim-account`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
+          body: JSON.stringify({ token: inviteToken, email: email.trim(), password }),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok || !body.ok) {
+          if (body.code === "account_exists") setMode("signin");
+          setError(body.hint ?? "Something fizzled. Try again.");
+          return;
+        }
+      }
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (error) {
+        setError(mode === "signin" ? "That email and password do not match." : "Your login was made but sign-in fizzled. Try signing in.");
+        if (mode !== "signin") setMode("signin");
+        return;
+      }
+      onSignedIn();
+    } catch {
+      setError("The shell lost its signal. Check your connection and try again.");
+    } finally {
+      setWorking(false);
+    }
   };
 
-  const verify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setWorking(true);
-    setError(null);
-    const { error } = await supabase.auth.verifyOtp({ email: email.trim(), token: code.trim(), type: "email" });
-    setWorking(false);
-    if (error) setError("That code did not match. Check the newest email and try again.");
-    else onSignedIn();
-  };
-
-  return stage === "email" ? (
-    <form onSubmit={sendLink} className="flex w-full flex-col gap-2">
-      <label className="text-left text-xs font-bold text-ink/60" htmlFor="email">
-        Your email
+  return (
+    <form onSubmit={submit} className="flex w-full flex-col gap-2 text-left">
+      <p className="text-center text-sm font-semibold text-ink/75">
+        {mode === "create" ? "Choose your coven login. You will use it every time you come back." : "Welcome back, witch."}
+      </p>
+      <label className="text-xs font-bold text-ink/60" htmlFor="email">
+        Email
+      </label>
+      <input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="witch@seashell.com" className={field} />
+      <label className="text-xs font-bold text-ink/60" htmlFor="password">
+        {mode === "create" ? "Choose a password (8+ characters)" : "Password"}
       </label>
       <input
-        id="email"
-        type="email"
+        id="password"
+        type="password"
         required
-        autoComplete="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="witch@seashell.com"
-        className="rounded-full border-2 border-shell-200 bg-white px-4 py-2.5 text-[16px] outline-none focus:border-shell-400"
+        minLength={mode === "create" ? 8 : 1}
+        autoComplete={mode === "create" ? "new-password" : "current-password"}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className={field}
       />
-      <button className="pearl-button" disabled={working}>
-        {working ? "Summoning..." : "Send my magic link"}
+      <button className="pearl-button mt-1" disabled={working}>
+        {working ? "Opening the shell..." : mode === "create" ? "Create my login" : "Enter the coven"}
       </button>
-      {error && <p className="text-sm font-semibold text-[#a8343f]">{error}</p>}
-    </form>
-  ) : (
-    <form onSubmit={verify} className="flex w-full flex-col gap-2">
-      <p className="text-sm text-ink/75">
-        A magic link and a code are on their way to <b>{email}</b>. Tap the link, or type the code here.
-      </p>
-      <input
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        value={code}
-        onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 10))}
-        placeholder="Code from the email"
-        className="rounded-full border-2 border-lagoon-300 bg-white px-4 py-2.5 text-center text-[18px] tracking-[0.3em] outline-none focus:border-lagoon-500"
-        aria-label="Code from the email"
-      />
-      <button className="pearl-button lagoon" disabled={working || code.length < 6}>
-        {working ? "Checking..." : "Enter the coven"}
-      </button>
-      <button type="button" className="text-xs font-bold text-ink/50" onClick={() => setStage("email")}>
-        Use a different email
-      </button>
-      {error && <p className="text-sm font-semibold text-[#a8343f]">{error}</p>}
+      {inviteToken && (
+        <button type="button" className="text-center text-xs font-bold text-ink/55" onClick={() => { setMode(mode === "create" ? "signin" : "create"); setError(null); }}>
+          {mode === "create" ? "Already have a coven login? Sign in" : "New here? Create a login"}
+        </button>
+      )}
+      {error && <p className="text-center text-sm font-semibold text-[#a8343f]">{error}</p>}
+      {!inviteToken && <p className="text-center text-xs text-ink/55">Forgot your password? Tell Rocha and she will sort it.</p>}
     </form>
   );
 }

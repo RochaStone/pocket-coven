@@ -47,9 +47,7 @@ export function Splash({ configured, signedIn, characterName, authError }: { con
                 </button>
               </div>
             ) : signingIn ? (
-              <div className="w-full max-w-xs">
-                <SignIn next="/play" onSignedIn={() => { router.push("/play"); router.refresh(); }} />
-              </div>
+              <p className="text-sm font-semibold text-ink/75">Sign in just below the shell.</p>
             ) : (
               <div className="flex flex-col items-center gap-2">
                 <button className="pearl-button" onClick={() => setSigningIn(true)}>
@@ -62,6 +60,11 @@ export function Splash({ configured, signedIn, characterName, authError }: { con
           </div>
         </ShellCompact>
       </div>
+      {open && signingIn && !characterName && !signedIn && (
+        <section className="pearl-panel mt-4 w-full max-w-sm p-5">
+          <SignIn onSignedIn={() => { router.push("/play"); router.refresh(); }} />
+        </section>
+      )}
       {!open && <p className="mt-4 animate-pulse text-sm font-bold text-shell-200">Tap the shell to open</p>}
     </main>
   );

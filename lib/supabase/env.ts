@@ -7,4 +7,6 @@ const PROD_SITE_URL = "https://pocket-coven.vercel.app";
 export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || PROD_SUPABASE_URL;
 export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || PROD_SUPABASE_PUBLISHABLE_KEY;
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || PROD_SITE_URL).replace(/\/$/, "");
+// Edge functions (overridable so local tests can run them outside the Supabase gateway).
+export const FUNCTIONS_URL = (process.env.NEXT_PUBLIC_FUNCTIONS_URL || `${SUPABASE_URL}/functions/v1`).replace(/\/$/, "");
 export const isConfigured = () => Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);

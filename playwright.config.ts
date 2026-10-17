@@ -13,5 +13,6 @@ export default defineConfig({
     browserName: "chromium",
     launchOptions: { executablePath: process.env.PW_CHROMIUM ?? undefined },
     trace: "retain-on-failure",
+    reducedMotion: "reduce",
   },
 });

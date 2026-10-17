@@ -1,0 +1,35 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@supabase/supabase-js@2": "2.118.0"
+  },
+  "jsr": {
+    "@supabase/supabase-js@2.118.0": {
+      "integrity": "42009f9d5b35997f35bba560d509f42608057cae647bd5a25b9b4a06ec3ffad0"
+    }
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@playwright/test@^1.64.1",
+        "npm:@supabase/ssr@~0.12.7",
+        "npm:@supabase/supabase-js@^2.118.0",
+        "npm:@tailwindcss/postcss@^4.3.3",
+        "npm:@types/node@^26.6.5",
+        "npm:@types/pg@^8.23.1",
+        "npm:@types/react-dom@^19.3.0",
+        "npm:@types/react@^19.3.0",
+        "npm:eslint-config-next@^16.4.2",
+        "npm:eslint@^9.39.5",
+        "npm:motion@^14.3.0",
+        "npm:next@^16.4.2",
+        "npm:pg@^8.23.1",
+        "npm:react-dom@^19.3.1",
+        "npm:react@^19.3.1",
+        "npm:tailwindcss@^4.3.3",
+        "npm:typescript@^6.0.3",
+        "npm:vitest@^5.0.5"
+      ]
+    }
+  }
+}

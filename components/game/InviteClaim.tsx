@@ -75,7 +75,7 @@ export function InviteClaim({ token, peek, signedIn }: { token: string; peek: Pe
               {working ? "Opening your shell..." : `Claim ${peek.name}`}
             </button>
           ) : (
-            <SignIn next={`/invite/${token}`} onSignedIn={() => { setAuthed(true); router.refresh(); }} />
+            <SignIn inviteToken={token} onSignedIn={() => { setAuthed(true); claim(); }} />
           )}
           {error && <p className="mt-2 text-sm font-semibold text-[#a8343f]">{error}</p>}
         </div>
