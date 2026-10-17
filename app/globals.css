@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+@theme {
+  --color-shell-50: #fff5fa;
+  --color-shell-100: #ffe4f1;
+  --color-shell-200: #ffc8e2;
+  --color-shell-300: #ff9fcb;
+  --color-shell-400: #f76fae;
+  --color-shell-500: #e64b93;
+  --color-lagoon-100: #d9fbf7;
+  --color-lagoon-300: #7ee6dc;
+  --color-lagoon-500: #22b8b0;
+  --color-lilac-100: #f1e8ff;
+  --color-lilac-300: #c9b0ff;
+  --color-lilac-500: #8f6bf0;
+  --color-champagne-200: #fbe9c4;
+  --color-champagne-400: #e9c27a;
+  --color-champagne-600: #b98a3a;
+  --color-coral-400: #ff8a73;
+  --color-ink: #4a2a4f;
+  --font-display: var(--font-display), ui-rounded, system-ui, sans-serif;
+  --font-body: var(--font-body), ui-rounded, system-ui, sans-serif;
+  --font-luxe: var(--font-luxe), Georgia, serif;
+}
+
+:root {
+  color-scheme: light;
+  --pearl: linear-gradient(135deg, #fff7fb 0%, #ffe3f1 30%, #e8f7ff 55%, #f4e9ff 75%, #fff4e0 100%);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: radial-gradient(120% 80% at 50% 0%, #ffe9f4 0%, #f6e6ff 45%, #d9f6f6 100%) fixed;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+/* Pearl-framed panel: the core UI ornament. */
+.pearl-panel {
+  position: relative;
+  background: rgba(255, 250, 253, 0.86);
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+  border: 2px solid #fff;
+  box-shadow:
+    0 0 0 3px #ffd2e7,
+    0 0 0 5px #fff,
+    0 12px 30px -10px rgba(170, 80, 140, 0.45),
+    inset 0 2px 0 rgba(255, 255, 255, 0.9);
+}
+
+.pearl-button {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: 999px;
+  padding: 0.6rem 1.2rem;
+  color: #fff;
+  background: linear-gradient(180deg, #ff9fcb 0%, #f06aa8 60%, #e64b93 100%);
+  box-shadow:
+    0 3px 0 #c43a7c,
+    0 8px 18px -6px rgba(230, 75, 147, 0.7),
+    inset 0 2px 0 rgba(255, 255, 255, 0.55);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s;
+  text-shadow: 0 1px 0 rgba(150, 30, 90, 0.35);
+}
+.pearl-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #c43a7c, 0 4px 10px -6px rgba(230, 75, 147, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.55);
+}
+.pearl-button:disabled {
+  filter: grayscale(0.6) opacity(0.6);
+}
+.pearl-button.lagoon {
+  background: linear-gradient(180deg, #8ff0e5 0%, #34c4ba 60%, #1fa59e 100%);
+  box-shadow: 0 3px 0 #16807a, 0 8px 18px -6px rgba(34, 184, 176, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.55);
+  text-shadow: 0 1px 0 rgba(10, 90, 85, 0.35);
+}
+.pearl-button.gold {
+  background: linear-gradient(180deg, #ffe7b0 0%, #e9c27a 60%, #c99a48 100%);
+  box-shadow: 0 3px 0 #9d7330, 0 8px 18px -6px rgba(185, 138, 58, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.6);
+  color: #5a3a12;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.pearl-button.ghost {
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--color-ink);
+  box-shadow: 0 2px 0 #f3c3dc, 0 6px 14px -8px rgba(170, 80, 140, 0.5);
+  text-shadow: none;
+}
+
+.title-script {
+  font-family: var(--font-luxe);
+  font-style: italic;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.6) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(45deg); }
+}
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes rise {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  20% { opacity: 0.9; }
+  100% { transform: translateY(-120px) scale(1.1); opacity: 0; }
+}
+.anim-twinkle { animation: twinkle 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.anim-float { animation: float-y 3.2s ease-in-out infinite; }
+.anim-rise { animation: rise 4s ease-in infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

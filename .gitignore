@@ -1,0 +1,14 @@
+node_modules
+.next
+.env
+.env.local
+.env*.local
+*.tsbuildinfo
+next-env.d.ts
+test-results
+playwright-report
+screenshots/tmp
+.vercel
+.next-*
+screenshots/
+scripts/tmp-*
