@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { ACTIVITIES } from "@/lib/game/catalog";
 import { ArtKeyframes, Frangipani, Glint, PLUM, Palm, Pearl, rng, star5Path, starPath, useArtId } from "./Sparkles";
 
@@ -1571,6 +1571,13 @@ function KCafeBG({ p }: { p: string }) {
   );
 }
 
+// Painted backdrops (Higgsfield, stored in the production `art` bucket). The drawn SVG scene stays
+// underneath as a fallback until the painting has loaded, or if it never does.
+const PAINTED_VERSION = 1;
+const PAINTED = new Set(["palace", "cafe", "grotto", "moon_deck", "lagoon", "reef", "beach", "lounge", "kairos_pool", "kairos_studio", "kairos_gym", "kairos_sound", "kairos_cowork", "kairos_cafe"]);
+export const paintedUrl = (locationId: string) =>
+  PAINTED.has(locationId) ? `https://ogvydqsynyksgbymptzm.supabase.co/storage/v1/object/public/art/scenes/${locationId}.jpg?v=${PAINTED_VERSION}` : null;
+
 const BACKDROPS: Record<string, (props: { p: string }) => ReactNode> = {
   palace: PalaceBG,
   cafe: CafeBG,
@@ -1655,6 +1662,9 @@ export function LocationScene({
 }) {
   const p = useArtId("ls");
   const BG = BACKDROPS[locationId] ?? PalaceBG;
+  const painting = paintedUrl(locationId);
+  const [loaded, setLoaded] = useState<string | null>(null);
+  const showPainting = painting !== null && loaded === painting;
   const hotIds = new Set(hotspots.map((h) => h.id));
   const acts = ACTIVITIES.filter((a) => a.locationId === locationId && (!a.adultOnly || hotIds.has(a.id)));
   // Greedy label placement: each pill goes below its ring unless that collides with an
@@ -1692,9 +1702,22 @@ export function LocationScene({
       <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" className="absolute inset-0 block" aria-hidden>
         <BG p={p} />
       </svg>
-      {acts.map((a) => (
-        <SceneObject key={a.id} activityId={a.id} x={a.spot.x} y={a.spot.y} />
-      ))}
+      {painting && (
+        // eslint-disable-next-line @next/next/no-img-element -- static public art; next/image adds nothing here
+        <img
+          src={painting}
+          alt=""
+          aria-hidden
+          decoding="async"
+          ref={(el) => {
+            if (el?.complete && el.naturalWidth > 0 && loaded !== painting) setLoaded(painting);
+          }}
+          onLoad={() => setLoaded(painting)}
+          className="absolute inset-0 block h-full w-full object-cover transition-opacity duration-500"
+          style={{ opacity: showPainting ? 1 : 0 }}
+        />
+      )}
+      {!showPainting && acts.map((a) => <SceneObject key={a.id} activityId={a.id} x={a.spot.x} y={a.spot.y} />)}
       <div className="pointer-events-none absolute inset-0" style={{ zIndex: 2 }}>
         {children}
       </div>
