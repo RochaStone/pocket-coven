@@ -51,7 +51,7 @@ const toEntry = (c: CharRow, prev?: RosterEntry): RosterEntry => ({
 });
 
 // Live view of the coven: roster, presence, chat, shared events and ephemeral broadcasts.
-export function useCoven(covenId: string, me: string, handlers: { onInvite: (i: ActivityInvite) => void; onEventChange: (e: SharedEvent[]) => void }) {
+export function useCoven(covenId: string, me: string, handlers: { onInvite: (i: ActivityInvite) => void; onEventChange: (e: SharedEvent[]) => void; onGift: (fromCharacter: string) => void }) {
   const supabase = supabaseBrowser();
   const [roster, setRoster] = useState<Record<string, RosterEntry>>({});
   const [chat, setChat] = useState<ChatMsg[]>([]);
@@ -159,6 +159,9 @@ export function useCoven(covenId: string, me: string, handlers: { onInvite: (i: 
       })
       .on("broadcast", { event: "invite" }, ({ payload }) => {
         if (payload.to === me) handlersRef.current.onInvite(payload as ActivityInvite);
+      })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "gifts", filter: `to_char=eq.${me}` }, (p) => {
+        handlersRef.current.onGift((p.new as { from_char: string }).from_char);
       })
       .on("broadcast", { event: "chat_deleted" }, ({ payload }) => {
         setChat((cur) => cur.filter((m) => m.id !== payload.id));

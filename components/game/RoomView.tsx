@@ -10,6 +10,7 @@ import type { Decoration, WitchPublic } from "@/lib/game/state";
 import { FLOORS, ROOM_COLS, ROOM_ROWS, WALLPAPERS } from "@/lib/game/types";
 import { useGame } from "./GameContext";
 import { NavIcon, PearlIcon } from "./Icons";
+import { TreasureAlbum } from "./TreasureAlbum";
 
 const WALL_LABEL: Record<string, string> = { pearl_stripe: "Pearl stripe", lagoon_tile: "Lagoon tile", moon_velvet: "Moon velvet", coral_damask: "Coral damask", kelp_mural: "Kelp mural" };
 const FLOOR_LABEL: Record<string, string> = { shell_parquet: "Shell parquet", sand: "Sand", marble: "Marble", moss: "Moss" };
@@ -116,7 +117,7 @@ function MyRoom() {
   const placeables = state.inventory
     .filter((i) => itemById(i.item_id)?.placeable)
     .map((i) => ({ ...i, left: i.qty - placedCount(i.item_id) }));
-  const shop = ITEMS.filter((i) => i.placeable && i.price);
+  const shop = ITEMS.filter((i) => i.placeable && i.price && (!i.season || i.season.includes(state.month)));
 
   const run = async (fn: () => Promise<void>) => {
     setWorking(true);
@@ -170,6 +171,7 @@ function MyRoom() {
         </div>
       </div>
 
+      {!editing && <TreasureAlbum />}
       {editing && (
         <>
           <p className="text-center text-xs font-semibold text-ink/60">
@@ -221,6 +223,7 @@ function MyRoom() {
                 >
                   <ItemIcon itemId={i.id} size={52} />
                   <span className="text-[11px] font-bold leading-tight">{i.name}</span>
+                  {i.season && <span className="rounded-full bg-coral-400/15 px-1.5 text-[9px] font-bold text-coral-400">Limited</span>}
                   <span className="mt-0.5 flex items-center gap-0.5 text-[11px] font-bold text-champagne-600">
                     <PearlIcon size={12} /> {i.price}
                   </span>

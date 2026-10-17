@@ -3,7 +3,9 @@ import { MiniWitch } from "@/components/art/Witch";
 import { activityById, CHARACTERS, locationById } from "@/lib/game/catalog";
 import { MOOD_LABEL, moodFromStats, projectStats } from "@/lib/game/logic";
 import { GAME_CONFIG } from "@/lib/game/catalog";
+import { api } from "@/lib/game/api";
 import { Chat, ReactionBar } from "./Chat";
+import { CovenGoalCard } from "./Rituals";
 import { useGame } from "./GameContext";
 
 function ago(iso: string, now: number) {
@@ -15,7 +17,7 @@ function ago(iso: string, now: number) {
 }
 
 export function CovenView() {
-  const { coven, state, go, view, toast, now } = useGame();
+  const { coven, state, go, view, toast, now, setComposeTo } = useGame();
   const me = state.character.id;
   const order = CHARACTERS.map((c) => c.id);
   const witches = Object.values(coven.roster).sort((a, b) => order.indexOf(a.id as never) - order.indexOf(b.id as never));
@@ -29,6 +31,7 @@ export function CovenView() {
           {coven.connected ? `${coven.online.size} online` : "Connecting..."}
         </span>
       </div>
+      <CovenGoalCard />
       <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {witches.map((r) => {
           const isMe = r.id === me;
@@ -61,14 +64,18 @@ export function CovenView() {
                 )}
                 {r.claimed && !isMe && (
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    <button className="pearl-button !px-2.5 !py-1 text-[11px]" onClick={() => setComposeTo(r.id)}>
+                      Send gift
+                    </button>
                     <button className="pearl-button ghost !px-2.5 !py-1 text-[11px]" onClick={() => go({ kind: "room", host: r.id })}>
                       Visit room
                     </button>
-                    {online && myLocation && (
+                    {myLocation && (
                       <button
                         className="pearl-button lagoon !px-2.5 !py-1 text-[11px]"
                         onClick={() => {
                           coven.inviteTo(r.id, myLocation, locationById(myLocation)?.name ?? "the shell");
+                          api.inviteWitch(r.id, myLocation).catch(() => {});
                           toast({ tone: "lagoon", text: `Invitation sent. ${r.name} has been summoned to ${locationById(myLocation)?.name}.` });
                         }}
                       >

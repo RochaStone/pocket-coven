@@ -5,6 +5,7 @@ import { ACHIEVEMENTS, activityById, itemById, locationById } from "@/lib/game/c
 import { renderFlavour } from "@/lib/game/logic";
 import type { ActivityResult, MyState, SharedEvent } from "@/lib/game/state";
 import type { AnimationKey, StatKey } from "@/lib/game/types";
+import { play as sfx } from "@/lib/sound";
 import { useCoven, type ActivityInvite, type Coven } from "./useCoven";
 
 export type View =
@@ -43,6 +44,10 @@ interface Ctx {
   announceAchievements: (ids: string[] | undefined) => void;
   refresh: () => Promise<void>;
   now: number;
+  giftsOpen: boolean;
+  setGiftsOpen: (open: boolean) => void;
+  composeTo: string | null;
+  setComposeTo: (to: string | null) => void;
 }
 
 const GameCtx = createContext<Ctx | null>(null);
@@ -52,15 +57,19 @@ export const useGame = () => {
   return c;
 };
 
-export function GameProvider({ initial, children }: { initial: MyState; children: React.ReactNode }) {
+export function GameProvider({ initial, initialView, children }: { initial: MyState; initialView?: View; children: React.ReactNode }) {
   // State plus the moment it was fetched, so cooldown badges can count down locally.
   const [bundle, setBundle] = useState(() => ({ state: initial, at: Date.now() }));
   const state = bundle.state;
-  const [view, setView] = useState<View>({ kind: "world" });
+  const [view, setView] = useState<View>(initialView ?? { kind: "world" });
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [playing, setPlaying] = useState<Ctx["playing"]>(null);
   const [treasure, setTreasure] = useState<string[] | null>(null);
+  const [giftsOpen, setGiftsOpen] = useState(false);
+  // Deep links from notifications: /play?go=gifts opens the inbox.
+  // (initialView handles locations; gifts is a sheet over the world.)
+  const [composeTo, setComposeTo] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const lastEvents = useRef<SharedEvent[] | null>(null);
 
@@ -97,6 +106,10 @@ export function GameProvider({ initial, children }: { initial: MyState; children
         text: `${from} invites you to ${inv.label} at ${loc?.name ?? "somewhere fabulous"}.`,
         action: { label: "Join", run: () => goRef.current({ kind: "location", id: inv.locationId }) },
       });
+    },
+    onGift: (from) => {
+      api.myState().then(setState).catch(() => {});
+      toast({ tone: "lagoon", text: `${coven.roster[from]?.name ?? "A witch"} sent you a gift.`, action: { label: "Open", run: () => setGiftsOpen(true) } });
     },
     onEventChange: (list) => {
       // Celebrate when an event I joined completes (the host pressed "Begin").
@@ -139,6 +152,7 @@ export function GameProvider({ initial, children }: { initial: MyState; children
       const r = await api.perform(activityId);
       setState(r.state);
       play(r.animation as AnimationKey);
+      sfx(r.pearls_delta > 0 ? "coin" : "bubble");
       const me = r.state.character;
       const line = renderFlavour(act.flavour[r.flavour_index] ?? act.flavour[0], me.name, me.pronouns);
       const chips: Toast["chips"] = Object.entries(r.effects)
@@ -197,9 +211,9 @@ export function GameProvider({ initial, children }: { initial: MyState; children
   const value = useMemo<Ctx>(
     () => ({
       state, setState, view, go, coven, toast, toasts, dismiss, fail, perform, busy, playing, play,
-      treasure, showTreasure: setTreasure, cooldownLeft, announceAchievements, refresh, now,
+      treasure, showTreasure: setTreasure, cooldownLeft, announceAchievements, refresh, now, giftsOpen, setGiftsOpen, composeTo, setComposeTo,
     }),
-    [state, setState, view, go, coven, toast, toasts, dismiss, fail, perform, busy, playing, play, treasure, cooldownLeft, announceAchievements, refresh, now],
+    [state, setState, view, go, coven, toast, toasts, dismiss, fail, perform, busy, playing, play, treasure, cooldownLeft, announceAchievements, refresh, now, giftsOpen, composeTo],
   );
   return <GameCtx.Provider value={value}>{children}</GameCtx.Provider>;
 }

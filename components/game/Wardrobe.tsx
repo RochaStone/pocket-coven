@@ -111,7 +111,7 @@ export function Wardrobe() {
                   Take off
                 </button>
               )}
-              {ITEMS.filter((i) => i.slot === slot && (owned.has(i.id) || i.price)).map((i) => {
+              {ITEMS.filter((i) => i.slot === slot && (owned.has(i.id) || (i.price && (!i.season || i.season.includes(state.month))))).map((i) => {
                 const has = owned.has(i.id);
                 const on = state.equipment[slot] === i.id;
                 const trying = tryOn?.itemId === i.id;
