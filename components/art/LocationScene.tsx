@@ -1573,10 +1573,11 @@ function KCafeBG({ p }: { p: string }) {
 
 // Painted backdrops (Higgsfield, stored in the production `art` bucket). The drawn SVG scene stays
 // underneath as a fallback until the painting has loaded, or if it never does.
-const PAINTED_VERSION = 1;
+// Bump to ship a new painted set (stored under scenes/v<N>/); older sets stay in the bucket.
+const PAINTED_VERSION = 2;
 const PAINTED = new Set(["palace", "cafe", "grotto", "moon_deck", "lagoon", "reef", "beach", "lounge", "kairos_pool", "kairos_studio", "kairos_gym", "kairos_sound", "kairos_cowork", "kairos_cafe"]);
 export const paintedUrl = (locationId: string) =>
-  PAINTED.has(locationId) ? `https://ogvydqsynyksgbymptzm.supabase.co/storage/v1/object/public/art/scenes/${locationId}.jpg?v=${PAINTED_VERSION}` : null;
+  PAINTED.has(locationId) ? `https://ogvydqsynyksgbymptzm.supabase.co/storage/v1/object/public/art/scenes/v${PAINTED_VERSION}/${locationId}.jpg` : null;
 
 const BACKDROPS: Record<string, (props: { p: string }) => ReactNode> = {
   palace: PalaceBG,
