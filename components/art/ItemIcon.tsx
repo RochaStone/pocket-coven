@@ -3,7 +3,7 @@
 import { useId, type ReactNode } from "react";
 import { itemById } from "@/lib/game/catalog";
 import { OUTLINE, safeId } from "./color";
-import { CompanionPart, DEFAULT_BUILD, EarringPart, HairAccPart, HatPart, NecklacePart, OutfitIconPart, SPARKLE_D, TailPart, starD } from "./Witch";
+import { BatClip, CompanionPart, DEFAULT_BUILD, EarringPart, HEART_D, HairAccPart, HatPart, NecklacePart, OutfitIconPart, SPARKLE_D, TailPart, starD } from "./Witch";
 
 const ol = { stroke: OUTLINE, strokeWidth: 1.8, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
 const thin = { stroke: OUTLINE, strokeWidth: 1.1, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
@@ -432,9 +432,285 @@ function drawPlaced(id: string, u: string): ReactNode {
           <Spark x={76} y={28} s={0.5} />
         </g>
       );
+    case "col_full_moon_pearl":
+      return (
+        <g>
+          <defs>
+            <RG id={`${u}-fmp`} stops={[[0, "#ffffff"], [0.4, "#f4f6fd"], [0.78, "#d3dbf0"], [1, "#aab4dc"]]} />
+            <RG id={`${u}-sglow`} cx={0.5} cy={0.5} r={0.5} stops={[[0, "#ffffff", 0.95], [0.5, "#dfe6ff", 0.55], [1, "#c9d3ff", 0]]} />
+          </defs>
+          <Floor w={22} y={86} />
+          <circle cx={50} cy={48} r={44} fill={`url(#${u}-sglow)`} />
+          <circle cx={50} cy={48} r={26} fill={`url(#${u}-fmp)`} {...ol} />
+          {[[58, 40, 5], [42, 58, 4], [62, 60, 3], [38, 42, 2.4]].map(([x, y, r], i) => (
+            <circle key={i} cx={x} cy={y} r={r} fill="#c6cfe8" opacity={0.6} />
+          ))}
+          <path d="M 30 50 A 20 20 0 0 0 66 66" stroke="#fff" strokeWidth={1.6} fill="none" opacity={0.7} />
+          <ellipse cx={40} cy={36} rx={8} ry={5} fill="#fff" transform="rotate(-30 40 36)" />
+          <circle cx={62} cy={58} r={1.6} fill="#fff" opacity={0.9} />
+          <Spark x={82} y={22} s={0.9} />
+          <Spark x={18} y={30} s={0.6} c="#e6ecff" />
+          <path d={starD(84, 66, 3.4, 1.4)} fill="#fff" />
+        </g>
+      );
+    case "col_new_moon_shard":
+      return (
+        <g>
+          <defs>
+            <LG id={`${u}-nms`} x2={1} y2={1} stops={[[0, "#5b4fa6"], [0.5, "#2f2766"], [1, "#1b1640"]]} />
+          </defs>
+          <Floor w={20} y={90} />
+          <circle cx={50} cy={50} r={38} fill={`url(#${u}-vglow)`} />
+          <path d="M 52 8 L 70 38 L 60 86 L 38 74 L 32 34 Z" fill={`url(#${u}-nms)`} {...ol} />
+          <path d="M 52 8 L 50 44 L 60 86 M 50 44 L 32 34 M 50 44 L 70 38 M 50 44 L 38 74" stroke="#7a6cc8" strokeWidth={1.1} fill="none" />
+          <path d="M 52 8 L 32 34 L 50 44 Z" fill="#7a6cc8" opacity={0.45} />
+          <path d="M 34 36 L 39 72" stroke="#eef0ff" strokeWidth={2} strokeLinecap="round" opacity={0.85} />
+          {[[54, 30, 1.2], [60, 54, 1.5], [46, 60, 1], [56, 72, 1.1], [44, 46, 0.9], [64, 42, 0.8]].map(([x, y, r], i) => (
+            <circle key={i} cx={x} cy={y} r={r} fill="#fff" />
+          ))}
+          <path d="M0 -5 A5 5 0 1 0 4 3.5 A3.8 3.8 0 1 1 0 -5 Z" transform="translate(52 62) scale(1.1)" fill="#e6e9ff" />
+          <Spark x={76} y={18} s={0.8} c="#e6e9ff" />
+          <Spark x={22} y={62} s={0.5} />
+        </g>
+      );
+    case "col_coven_charm": {
+      const P0: [number, number] = [12, 26];
+      const P1: [number, number] = [50, 80];
+      const P2: [number, number] = [88, 26];
+      const at = (t: number): [number, number] => [(1 - t) ** 2 * P0[0] + 2 * (1 - t) * t * P1[0] + t * t * P2[0], (1 - t) ** 2 * P0[1] + 2 * (1 - t) * t * P1[1] + t * t * P2[1]];
+      const shells: [number, string, string][] = [[0.16, "#ff9fcb", "#e8609f"], [0.33, "#3a3342", "#9a93a8"], [0.5, "#b48cf0", "#8a62d8"], [0.67, "#f6c86e", "#d39a3c"], [0.84, "#cfe6ff", "#8fb4e0"]];
+      return (
+        <g>
+          <path d={`M ${P0[0]} ${P0[1]} Q ${P1[0]} ${P1[1]} ${P2[0]} ${P2[1]}`} stroke={OUTLINE} strokeWidth={3.6} fill="none" strokeLinecap="round" />
+          <path d={`M ${P0[0]} ${P0[1]} Q ${P1[0]} ${P1[1]} ${P2[0]} ${P2[1]}`} stroke="#f0c76e" strokeWidth={2} fill="none" strokeLinecap="round" />
+          {[P0, P2].map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r={3.4} fill="none" stroke={`url(#${u}-gold)`} strokeWidth={2.4} />
+          ))}
+          <path d="M 50 53 L 50 60" stroke="#c8923c" strokeWidth={1.4} />
+          <path d={HEART_D} transform="translate(50 68) scale(1.5)" fill={`url(#${u}-gold)`} stroke={OUTLINE} strokeWidth={0.8} />
+          {shells.map(([t, c, line], i) => {
+            const [x, y] = at(t);
+            const sh = fan(0, 7, 11, 5, 180, 360, 2.8);
+            return (
+              <g key={i} transform={`translate(${x.toFixed(1)} ${(y + 4).toFixed(1)}) rotate(${((t - 0.5) * 60).toFixed(0)})`}>
+                <path d={sh.d} fill={c} {...thin} />
+                {sh.pts.slice(1, -1).map(([px, py], j) => (
+                  <path key={j} d={`M 0 6 L ${px.toFixed(1)} ${py.toFixed(1)}`} stroke={line} strokeWidth={0.8} opacity={0.9} />
+                ))}
+                <path d="M -3 7 L -4 10 L 4 10 L 3 7 Z" fill={c} {...thin} />
+                <path d="M -5 -1 Q -3 -3 0 -3.6" stroke="#fff" strokeWidth={1} fill="none" opacity={0.7} strokeLinecap="round" />
+              </g>
+            );
+          })}
+          <Spark x={80} y={58} s={0.7} c="#f4d68e" />
+          <Spark x={20} y={60} s={0.5} />
+        </g>
+      );
+    }
+    case "decor_pumpkin_lantern":
+      return (
+        <g>
+          <defs>
+            <LG id={`${u}-pk`} stops={[[0, "#ffd6e8"], [0.6, "#ff9fc8"], [1, "#ec7fb3"]]} />
+          </defs>
+          <Floor w={32} y={90} />
+          <circle cx={50} cy={58} r={40} fill={`url(#${u}-glow)`} />
+          <path d="M 50 30 C 50 22 52 16 58 12" stroke={OUTLINE} strokeWidth={6.4} fill="none" strokeLinecap="round" />
+          <path d="M 50 30 C 50 22 52 16 58 12" stroke="#7fcf9f" strokeWidth={3.8} fill="none" strokeLinecap="round" />
+          <path d="M 56 22 C 64 16 72 20 68 26 C 66 29 62 27 64 24" stroke="#5fae7c" strokeWidth={1.6} fill="none" strokeLinecap="round" />
+          <ellipse cx={30} cy={60} rx={19} ry={25} fill={`url(#${u}-pk)`} {...ol} />
+          <ellipse cx={70} cy={60} rx={19} ry={25} fill={`url(#${u}-pk)`} {...ol} />
+          <ellipse cx={50} cy={60} rx={19} ry={28} fill="#ffb8d6" {...ol} />
+          <path d="M 42 40 Q 38 60 42 82 M 58 40 Q 62 60 58 82" stroke="#ec7fb3" strokeWidth={1.2} fill="none" />
+          <path d="M 36 42 Q 40 36 46 35" stroke="#fff" strokeWidth={2.2} fill="none" strokeLinecap="round" opacity={0.8} />
+          <path d={starD(40, 55, 5.6, 2.4)} fill="#ffe08a" stroke="#c9774a" strokeWidth={1} strokeLinejoin="round" />
+          <path d={starD(60, 55, 5.6, 2.4)} fill="#ffe08a" stroke="#c9774a" strokeWidth={1} strokeLinejoin="round" />
+          <path d="M 32 64 Q 50 86 68 64 Q 50 76 32 64 Z" fill="#ffe08a" stroke="#c9774a" strokeWidth={1.1} strokeLinejoin="round" />
+          <path d="M 38 68 Q 50 74 62 68" stroke="#fff8d6" strokeWidth={1.2} fill="none" opacity={0.8} />
+          <ellipse cx={26} cy={66} rx={4} ry={2.4} fill="#ff6f9f" opacity={0.4} />
+          <ellipse cx={74} cy={66} rx={4} ry={2.4} fill="#ff6f9f" opacity={0.4} />
+          <Spark x={84} y={30} s={0.7} c="#f4d68e" />
+        </g>
+      );
+    case "decor_coral_tree": {
+      const branches: [number, number, number, number][] = [
+        [72, -1, 26, 10],
+        [72, 1, 26, 10],
+        [58, -1, 21, 8],
+        [58, 1, 21, 8],
+        [44, -1, 15, 7],
+        [44, 1, 15, 7],
+        [32, -1, 9, 5],
+        [32, 1, 9, 5],
+      ];
+      const d = branches.map(([y, s, len, rise]) => `M 50 ${y + 4} C ${50 + s * len * 0.4} ${y + 2} ${50 + s * len * 0.8} ${y - rise * 0.3} ${50 + s * len} ${y - rise}`).join(" ") + " M 50 84 L 50 20";
+      const garland = (y: number, w: number) => Array.from({ length: 7 }, (_, i) => {
+        const t = i / 6;
+        return [50 - w + 2 * w * t, y + Math.sin(t * Math.PI) * 6 - t * 6] as [number, number];
+      });
+      return (
+        <g>
+          <circle cx={50} cy={46} r={40} fill={`url(#${u}-glow)`} opacity={0.7} />
+          <path d={d} stroke={OUTLINE} strokeWidth={8} fill="none" strokeLinecap="round" />
+          <path d={d} stroke="#ff9fb8" strokeWidth={5} fill="none" strokeLinecap="round" />
+          <path d="M 48 80 L 48 26" stroke="#ffd2dc" strokeWidth={1.4} strokeLinecap="round" />
+          {[[24, 62], [76, 62], [29, 50], [71, 50], [35, 37], [65, 37], [41, 27], [59, 27]].map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r={2.2} fill={i % 2 ? "#ffc2d0" : "#ffb0c4"} stroke={OUTLINE} strokeWidth={0.8} />
+          ))}
+          {[garland(54, 22), garland(40, 15)].map((pts, g) => (
+            <g key={g}>
+              <path d={`M ${pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(" L ")}`} stroke="#e9c27a" strokeWidth={0.8} fill="none" />
+              {pts.map(([x, y], i) => (
+                <circle key={i} cx={x} cy={y} r={2} fill={`url(#${u}-pearl)`} stroke={OUTLINE} strokeWidth={0.6} />
+              ))}
+            </g>
+          ))}
+          <circle cx={36} cy={66} r={2.4} fill="#9fe6dc" stroke={OUTLINE} strokeWidth={0.8} />
+          <circle cx={64} cy={46} r={2.4} fill="#c9b6ff" stroke={OUTLINE} strokeWidth={0.8} />
+          <circle cx={58} cy={66} r={2.2} fill={`url(#${u}-gold)`} stroke={OUTLINE} strokeWidth={0.8} />
+          <path d={starD(50, 16, 9, 4)} fill={`url(#${u}-gold)`} stroke={OUTLINE} strokeWidth={1.4} strokeLinejoin="round" />
+          <circle cx={48} cy={14} r={1.4} fill="#fff" />
+          <path d="M 32 80 L 68 80 L 63 93 Q 50 96 37 93 Z" fill={`url(#${u}-pink)`} {...ol} />
+          <path d="M 30 80 Q 33 75 36 80 Q 39 75 42 80 Q 45 75 48 80 Q 51 75 54 80 Q 57 75 60 80 Q 63 75 66 80 Q 69 75 70 80 L 70 83 L 30 83 Z" fill="#ffc6dd" {...thin} />
+          <path d="M 42 84 L 44 92 M 50 84 L 50 93 M 58 84 L 56 92" stroke="#e47aae" strokeWidth={1} />
+          <Spark x={20} y={30} s={0.6} />
+          <Spark x={82} y={24} s={0.5} c="#f4d68e" />
+        </g>
+      );
+    }
     default:
       return null;
   }
+}
+
+function drawTreat(id: string, u: string): ReactNode {
+  switch (id) {
+    case "treat_matcha":
+      return (
+        <g>
+          <defs>
+            <LG id={`${u}-mt`} stops={[[0, "#ffe3ef"], [0.4, "#ffa8cb"], [0.56, "#d2edb0"], [1, "#82c46a"]]} />
+          </defs>
+          <Floor w={20} y={92} />
+          <path d="M 60 6 L 53 34" stroke={OUTLINE} strokeWidth={5.6} strokeLinecap="round" />
+          <path d="M 60 6 L 53 34" stroke="#ff8fc8" strokeWidth={3.6} strokeLinecap="round" />
+          <path d="M 30 30 L 70 30 L 65 88 Q 50 92 35 88 Z" fill={`url(#${u}-mt)`} {...ol} />
+          <rect x={35} y={32} width={11} height={10} rx={2.4} fill="#fff" opacity={0.55} transform="rotate(-12 40 37)" {...thin} />
+          <rect x={50} y={36} width={10} height={9} rx={2.4} fill="#fff" opacity={0.5} transform="rotate(10 55 40)" {...thin} />
+          <ellipse cx={50} cy={30} rx={21} ry={3.6} fill="#fff4fb" opacity={0.85} {...thin} />
+          <path d="M 36 40 L 40 82" stroke="#fff" strokeWidth={2.4} strokeLinecap="round" opacity={0.6} />
+          <path d={HEART_D} transform="translate(52 70) scale(1.3)" fill="#fff" opacity={0.85} />
+          <g transform="translate(70 28) rotate(22)">
+            <path d="M 0 10 C -8 5 -10 -3 -5 -6 C -2 -7 0 -5 0 -5 C 0 -5 2 -7 5 -6 C 10 -3 8 5 0 10 Z" fill="#ff6f8f" {...thin} />
+            <path d="M -5 -6 L -2 -9 L 0 -6 L 2 -9 L 5 -6 Z" fill="#7cc795" {...thin} />
+            <circle cx={-2} cy={0} r={0.7} fill="#fff1c4" />
+            <circle cx={2} cy={3} r={0.7} fill="#fff1c4" />
+          </g>
+        </g>
+      );
+    case "treat_broth":
+      return (
+        <g>
+          <defs>
+            <LG id={`${u}-bowl`} stops={[[0, "#f1e8ff"], [0.6, "#cbb6ff"], [1, "#a68be8"]]} />
+            <RG id={`${u}-broth`} stops={[[0, "#ffe8b0"], [0.7, "#f6c46a"], [1, "#e0a24a"]]} />
+          </defs>
+          <Floor w={30} y={92} />
+          {[38, 50, 62].map((x, i) => (
+            <path key={x} d={`M ${x} 42 C ${x - 5} 36 ${x + 5} 30 ${x} 24 C ${x - 4} 20 ${x + 2} 16 ${x} 12`} stroke="#fff" strokeWidth={3} fill="none" strokeLinecap="round" opacity={0.85 - i * 0.1} />
+          ))}
+          <rect x={38} y={82} width={24} height={7} rx={3} fill="#b39ef0" {...ol} />
+          <path d="M 14 52 Q 16 88 50 88 Q 84 88 86 52 Z" fill={`url(#${u}-bowl)`} {...ol} />
+          <path d="M 24 66 Q 50 74 76 66" stroke="#fff" strokeWidth={1.6} fill="none" opacity={0.6} />
+          <path d={HEART_D} transform="translate(50 76) scale(1.1)" fill="#ff9fcb" />
+          <ellipse cx={50} cy={52} rx={36} ry={9} fill="#fff4fb" {...ol} />
+          <ellipse cx={50} cy={53} rx={30} ry={6.4} fill={`url(#${u}-broth)`} stroke="#d39a3c" strokeWidth={0.8} />
+          <circle cx={40} cy={52} r={3} fill="#ffa25a" stroke="#d47a3a" strokeWidth={0.6} />
+          <ellipse cx={56} cy={51} rx={3.4} ry={1.6} fill="#7cc795" transform="rotate(-20 56 51)" />
+          <ellipse cx={47} cy={55} rx={2.6} ry={1.2} fill="#5fae7c" transform="rotate(25 47 55)" />
+          <circle cx={63} cy={54} r={1.4} fill="#fff6d8" />
+          <circle cx={34} cy={55} r={1.1} fill="#fff6d8" />
+          <path d="M 70 50 L 86 30" stroke={OUTLINE} strokeWidth={5} strokeLinecap="round" />
+          <path d="M 70 50 L 86 30" stroke="#fff4fb" strokeWidth={3} strokeLinecap="round" />
+        </g>
+      );
+    case "treat_pancakes":
+      return (
+        <g>
+          <Floor w={36} y={90} />
+          <ellipse cx={50} cy={80} rx={42} ry={10} fill={`url(#${u}-pearl)`} {...ol} />
+          <ellipse cx={50} cy={78} rx={30} ry={6} fill="none" stroke="#e7d4ee" strokeWidth={1.2} />
+          {[0, 1, 2].map((i) => {
+            const y = 70 - i * 11;
+            return (
+              <g key={i}>
+                <path d={`M 18 ${y} Q 18 ${y + 9} 50 ${y + 10} Q 82 ${y + 9} 82 ${y} L 82 ${y - 3} L 18 ${y - 3} Z`} fill="#e8a95e" {...ol} />
+                <ellipse cx={50} cy={y - 3} rx={32} ry={7} fill="#ffd590" {...ol} />
+              </g>
+            );
+          })}
+          <path d="M 26 46 Q 30 40 40 41 Q 50 40 60 41 Q 70 40 74 46 Q 75 54 71 54 Q 68 54 68 49 Q 64 52 60 50 Q 58 60 54 60 Q 50 60 50 51 Q 44 52 40 50 Q 38 56 34 56 Q 30 56 31 49 Q 27 50 26 46 Z" fill="#ff9fc4" stroke={OUTLINE} strokeWidth={1.1} strokeLinejoin="round" />
+          <path d="M 34 44 Q 42 41 50 42" stroke="#fff" strokeWidth={1.4} fill="none" strokeLinecap="round" opacity={0.8} />
+          <rect x={44} y={34} width={12} height={8} rx={2} fill="#fff3a8" {...thin} transform="rotate(-8 50 38)" />
+          {[[34, 40], [64, 42], [58, 36]].map(([x, y], i) => (
+            <g key={i}>
+              <circle cx={x} cy={y} r={3.2} fill={`url(#${u}-pearl)`} {...thin} strokeWidth={0.9} />
+              <circle cx={x - 1} cy={y - 1} r={1} fill="#fff" />
+            </g>
+          ))}
+          <Spark x={80} y={28} s={0.6} />
+        </g>
+      );
+    case "treat_bouquet": {
+      const flower = (x: number, y: number, s: number, pink: boolean, r = 0) => (
+        <g transform={`translate(${x} ${y}) rotate(${r}) scale(${s})`}>
+          {[0, 72, 144, 216, 288].map((a) => (
+            <path key={a} d="M 0 0 C -6 -3 -7 -11 -1 -13 C 4 -13 5 -6 0 0 Z" fill={pink ? "#ffc2dc" : "#fffaf3"} stroke={OUTLINE} strokeWidth={0.9} strokeLinejoin="round" transform={`rotate(${a})`} />
+          ))}
+          {[0, 72, 144, 216, 288].map((a) => (
+            <path key={`c${a}`} d="M 0 -1 L -0.6 -7" stroke={pink ? "#ff8fbf" : "#ffd36a"} strokeWidth={2} strokeLinecap="round" transform={`rotate(${a})`} />
+          ))}
+          <circle r={2.6} fill="#ffcf5a" />
+        </g>
+      );
+      return (
+        <g>
+          <Floor w={18} y={94} />
+          {[[30, 40, -40], [70, 38, 40], [50, 22, 0]].map(([x, y, r], i) => (
+            <ellipse key={i} cx={x} cy={y} rx={5} ry={12} fill="#6fc391" {...thin} transform={`rotate(${r} ${x} ${y})`} />
+          ))}
+          {flower(36, 34, 1.05, false, 10)}
+          {flower(62, 30, 1.0, true, -15)}
+          {flower(48, 46, 1.1, false, 30)}
+          {flower(30, 54, 0.85, true, 5)}
+          {flower(68, 52, 0.9, false, -20)}
+          <path d="M 26 58 L 74 58 L 56 94 L 44 94 Z" fill="#d9c6ff" {...ol} />
+          <path d="M 26 58 L 40 68 L 50 58 L 60 68 L 74 58" fill="#efe6ff" {...thin} />
+          <path d="M 34 66 L 48 92" stroke="#fff" strokeWidth={1.6} opacity={0.6} strokeLinecap="round" />
+          <g transform="translate(50 76)">
+            <path d="M 0 0 C -5 -7 -13 -6 -12 0 C -13 6 -5 7 0 0 Z M 0 0 C 5 -7 13 -6 12 0 C 13 6 5 7 0 0 Z" fill="#ff9fcb" {...thin} />
+            <path d="M -2 1 L -6 10 L -3 9 L -1 12 Z M 2 1 L 6 10 L 3 9 L 1 12 Z" fill="#f772b3" {...thin} />
+            <circle r={2.6} fill="#ffb3d5" {...thin} />
+          </g>
+          <Spark x={82} y={22} s={0.6} />
+        </g>
+      );
+    }
+    default:
+      return null;
+  }
+}
+
+function SilhouetteMark() {
+  return (
+    <g>
+      <path d={SPARKLE_D} transform="translate(80 18) scale(2.1)" fill="#fffaff" stroke="#b9a3e3" strokeWidth={0.5} />
+      <text x={80} y={22.6} textAnchor="middle" fontFamily="var(--font-display), ui-rounded, system-ui, sans-serif" fontWeight={700} fontSize={12} fill="#8e74c9">
+        ?
+      </text>
+      <path d={SPARKLE_D} transform="translate(93 32) scale(0.6)" fill="#fff" stroke="#c9b6ec" strokeWidth={0.6} />
+    </g>
+  );
 }
 
 const HAT_FIT: Record<string, [number, number]> = {
@@ -446,6 +722,7 @@ const HAT_FIT: Record<string, [number, number]> = {
   hat_flower_crown: [0.85, 8],
   hat_beanie_black: [0.72, 10],
   hat_crystal_tiara: [1.35, -4],
+  hat_snow_pearl: [0.8, -4],
 };
 
 function drawWearable(id: string, slot: string, u: string): ReactNode {
@@ -492,6 +769,18 @@ function drawWearable(id: string, slot: string, u: string): ReactNode {
         </g>
       );
     case "hair_acc":
+      if (id === "hair_bat_clips")
+        return (
+          <g>
+            <g transform="translate(32 40) rotate(-14) scale(1.75)">
+              <BatClip />
+            </g>
+            <g transform="translate(66 66) rotate(12) scale(1.45)">
+              <BatClip />
+            </g>
+            <Spark x={80} y={26} s={0.6} c="#f4d68e" />
+          </g>
+        );
       if (id === "hair_moon_pins")
         return (
           <g>
@@ -524,11 +813,22 @@ function drawWearable(id: string, slot: string, u: string): ReactNode {
   }
 }
 
-export function ItemIcon({ itemId, size = 56, className }: { itemId: string; size?: number; className?: string }) {
+/** Ids drawn by ItemIcon that are not ItemDefs (gift treats live in GIFT_TREATS). */
+const TREAT_IDS = new Set(["treat_matcha", "treat_broth", "treat_pancakes", "treat_bouquet"]);
+
+const TREAT_NAMES: Record<string, string> = {
+  treat_matcha: "Strawberry iced matcha",
+  treat_broth: "Bone broth",
+  treat_pancakes: "Pearl pancakes",
+  treat_bouquet: "Frangipani bouquet",
+};
+
+export function ItemIcon({ itemId, size = 56, className, silhouette = false }: { itemId: string; size?: number; className?: string; silhouette?: boolean }) {
   const u = safeId(useId());
   const item = itemById(itemId);
   let art: ReactNode = null;
-  if (item?.slot) art = drawWearable(itemId, item.slot, u);
+  if (TREAT_IDS.has(itemId)) art = drawTreat(itemId, u);
+  else if (item?.slot) art = drawWearable(itemId, item.slot, u);
   else if (item) art = drawPlaced(itemId, u);
   if (!art) {
     art = (
@@ -539,10 +839,35 @@ export function ItemIcon({ itemId, size = 56, className }: { itemId: string; siz
       </g>
     );
   }
+  const name = item?.name ?? TREAT_NAMES[itemId] ?? "Pearl";
   return (
-    <svg viewBox="0 0 100 100" width={size} height={size} className={className} role="img" aria-label={item?.name ?? "Pearl"} style={{ overflow: "visible" }}>
+    <svg viewBox="0 0 100 100" width={size} height={size} className={className} role="img" aria-label={silhouette ? "Undiscovered item" : name} style={{ overflow: "visible" }}>
       <SharedDefs u={u} />
-      {art}
+      {silhouette ? (
+        <>
+          <defs>
+            <filter id={`${u}-sil`} x="-30%" y="-30%" width="160%" height="160%" colorInterpolationFilters="sRGB">
+              <feFlood floodColor="#cbb8ec" result="lilac" />
+              <feComposite in="lilac" in2="SourceAlpha" operator="in" result="shape" />
+              <feMorphology in="SourceAlpha" operator="erode" radius="2.4" result="inner" />
+              <feGaussianBlur in="inner" stdDeviation="3" result="soft" />
+              <feFlood floodColor="#e6dcfa" result="pale" />
+              <feComposite in="pale" in2="soft" operator="in" result="glow" />
+              <feComposite in="glow" in2="SourceAlpha" operator="in" result="glowIn" />
+              <feMerge>
+                <feMergeNode in="shape" />
+                <feMergeNode in="glowIn" />
+              </feMerge>
+            </filter>
+          </defs>
+          <g filter={`url(#${u}-sil)`} opacity={0.9}>
+            {art}
+          </g>
+          <SilhouetteMark />
+        </>
+      ) : (
+        art
+      )}
     </svg>
   );
 }

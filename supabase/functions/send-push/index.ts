@@ -2,14 +2,17 @@
 // Woken every minute by game.dispatch_push() (pg_cron + pg_net) with the shared secret header.
 // Deploy with JWT verification off (the cron call carries x-push-secret, not a JWT):
 //   supabase functions deploy send-push --no-verify-jwt
-// Env: PUSH_CRON_SECRET, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT (+ SUPABASE_URL,
-// SUPABASE_SERVICE_ROLE_KEY, provided by Supabase). Rows are only ever updated, never deleted.
+// Config (VAPID keys, subject, cron secret) comes from the service-role-only RPC push_config(),
+// which reads game.private_config; each value falls back to env (PUSH_CRON_SECRET, VAPID_PUBLIC_KEY,
+// VAPID_PRIVATE_KEY, VAPID_SUBJECT) for local runs. SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are
+// provided by Supabase. Rows are only ever updated, never deleted.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import webpush from "npm:web-push@3.6.7";
 
 type QueueRow = { id: number; character_id: string; kind: string; title: string; body: string; url: string; attempts: number };
 type Sub = { id: number; character_id: string; endpoint: string; p256dh: string; auth: string };
 type Outcome = "ok" | "gone" | "error";
+type Config = { vapidPublic: string; vapidPrivate: string; vapidSubject: string; pushSecret: string };
 
 const BATCH = 50;
 const MAX_ATTEMPTS = 3;
@@ -27,21 +30,44 @@ function safeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
+const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
+  auth: { persistSession: false, autoRefreshToken: false },
+});
+
+// Cached for the life of the isolate once complete; an incomplete config is re-read next call.
+let cachedConfig: Config | null = null;
+
+async function loadConfig(): Promise<Config | null> {
+  if (cachedConfig) return cachedConfig;
+  let fromDb: Record<string, unknown> = {};
+  try {
+    const { data, error } = await db.rpc("push_config");
+    if (!error && data && typeof data === "object") fromDb = data as Record<string, unknown>;
+  } catch {
+    // RPC missing or unreachable: env fallback below.
+  }
+  const pick = (key: string, env: string) => {
+    const v = fromDb[key];
+    return typeof v === "string" && v ? v : Deno.env.get(env) || "";
+  };
+  const config: Config = {
+    vapidPublic: pick("vapid_public", "VAPID_PUBLIC_KEY"),
+    vapidPrivate: pick("vapid_private", "VAPID_PRIVATE_KEY"),
+    vapidSubject: pick("vapid_subject", "VAPID_SUBJECT") || "https://pocket-coven.vercel.app",
+    pushSecret: pick("push_secret", "PUSH_CRON_SECRET"),
+  };
+  if (!config.vapidPublic || !config.vapidPrivate || !config.pushSecret) return null;
+  webpush.setVapidDetails(config.vapidSubject, config.vapidPublic, config.vapidPrivate);
+  cachedConfig = config;
+  return config;
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") return json(405, { ok: false, code: "method" });
 
-  const secret = Deno.env.get("PUSH_CRON_SECRET") ?? "";
-  if (!secret || !safeEqual(req.headers.get("x-push-secret") ?? "", secret)) return json(401, { ok: false, code: "unauthorized" });
-
-  const publicKey = Deno.env.get("VAPID_PUBLIC_KEY");
-  const privateKey = Deno.env.get("VAPID_PRIVATE_KEY");
-  const subject = Deno.env.get("VAPID_SUBJECT") || "https://pocket-coven.vercel.app";
-  if (!publicKey || !privateKey) return json(500, { ok: false, code: "vapid_missing" });
-  webpush.setVapidDetails(subject, publicKey, privateKey);
-
-  const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  const config = await loadConfig();
+  if (!config) return json(503, { ok: false, code: "config_missing" });
+  if (!safeEqual(req.headers.get("x-push-secret") ?? "", config.pushSecret)) return json(401, { ok: false, code: "unauthorized" });
 
   const { data: rows, error: qErr } = await db
     .from("notify_queue")

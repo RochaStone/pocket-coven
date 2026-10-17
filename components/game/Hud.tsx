@@ -7,6 +7,7 @@ import { MOOD_LABEL, xpForLevel } from "@/lib/game/logic";
 import { STATS, type StatKey } from "@/lib/game/types";
 import { useGame, type View } from "./GameContext";
 import { NavIcon, PearlIcon, StatIcon } from "./Icons";
+import { SoundToggle } from "./SoundToggle";
 
 const STAT_LABEL: Record<StatKey, string> = { nourishment: "Nourishment", energy: "Energy", joy: "Joy", magic: "Magic", social: "Social" };
 const STAT_COLOR: Record<StatKey, string> = {
@@ -60,11 +61,14 @@ export function Hud() {
             </div>
           </div>
         </div>
+        <div className="flex shrink-0 items-center gap-1.5">
+        <SoundToggle className="!h-8 !w-8" />
         <div className="flex shrink-0 items-center gap-1 rounded-full bg-gradient-to-b from-white to-champagne-200 px-3 py-1 ring-2 ring-champagne-400/60" aria-label={`${state.pearls} pearls`}>
           <PearlIcon size={20} />
           <motion.span key={state.pearls} initial={{ scale: 1.35 }} animate={{ scale: 1 }} className="font-[family-name:var(--font-display)] text-base font-semibold tabular-nums text-champagne-600">
             {state.pearls}
           </motion.span>
+        </div>
         </div>
       </div>
       <div className="mt-2 grid grid-cols-5 gap-2">

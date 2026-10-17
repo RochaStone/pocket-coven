@@ -170,6 +170,24 @@ describe("notifications", () => {
   });
 });
 
+describe("push sender config", () => {
+  it("is readable by the service role only", async () => {
+    await sql("insert into game.private_config (key, value) values ('vapid_private', 'secret-key') on conflict (key) do update set value = excluded.value");
+    await expectFail(rpc(pool, lizz, "push_config"), "permission denied");
+    await expectFail(rpc(pool, null, "push_config"), "permission denied");
+    await expectFail(as(pool, rocha, "select * from game.private_config"), "permission denied");
+    const client = await pool.connect();
+    try {
+      await client.query("begin; set local role service_role");
+      const { rows } = await client.query("select public.push_config() as c");
+      expect(rows[0].c.vapid_private).toBe("secret-key");
+      await client.query("commit");
+    } finally {
+      client.release();
+    }
+  });
+});
+
 describe("owner activity view", () => {
   it("is owner-only and reports everyone", async () => {
     await expectFail(rpc(pool, lizz, "admin_activity_summary"), "not_admin");

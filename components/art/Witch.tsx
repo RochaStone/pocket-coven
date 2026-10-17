@@ -1112,6 +1112,51 @@ export function HatPart({ id, u }: { id: string; u: string }) {
         </g>
       );
     }
+    case "hat_snow_pearl": {
+      const n = 13;
+      let fluff = "";
+      for (let i = 0; i <= n; i++) {
+        const a = Math.PI + (i / n) * Math.PI * 2;
+        const x = f(6 + Math.cos(a) * 50);
+        const y = f(-8 + Math.sin(a) * 21);
+        if (i === 0) fluff = `M ${x} ${y}`;
+        else {
+          const m = a - Math.PI / n;
+          fluff += ` Q ${f(6 + Math.cos(m) * 58)} ${f(-8 + Math.sin(m) * 28)} ${x} ${y}`;
+        }
+      }
+      return (
+        <g transform="rotate(-12) translate(0 8)">
+          <defs>
+            <radialGradient id={`${u}-beret`} cx="0.4" cy="0.25" r="0.8">
+              <stop offset="0" stopColor="#ffffff" />
+              <stop offset="0.55" stopColor="#f7f3fd" />
+              <stop offset="1" stopColor="#cfc2ea" />
+            </radialGradient>
+            <radialGradient id={`${u}-bpearl`} cx="0.38" cy="0.32" r="0.7">
+              <stop offset="0" stopColor="#ffffff" />
+              <stop offset="0.5" stopColor="#fff2f8" />
+              <stop offset="1" stopColor="#d9dcf5" />
+            </radialGradient>
+          </defs>
+          <path d="M -38 6 Q 0 18 38 6 L 38 15 Q 0 27 -38 15 Z" fill="#e6def4" {...ol} />
+          <path d="M -30 12 Q 0 21 30 12" stroke="#fff" strokeWidth={1.2} fill="none" opacity={0.8} />
+          <path d={fluff + " Z"} fill={`url(#${u}-beret)`} {...ol} />
+          <path d="M -40 2 Q 6 16 52 0 Q 8 10 -40 2 Z" fill="#d6cbee" opacity={0.8} />
+          <path d="M -34 -8 Q -38 -16 -30 -22 M -14 -26 Q -6 -31 2 -28 M 22 -26 Q 30 -26 34 -20 M 44 -10 Q 50 -6 48 0" stroke="#d2c6ea" strokeWidth={1.4} fill="none" strokeLinecap="round" />
+          <path d="M -26 -16 Q -12 -27 6 -27" stroke="#fff" strokeWidth={3.4} fill="none" strokeLinecap="round" opacity={0.95} />
+          <path d="M 6 -33 Q 8 -41 13 -39" stroke={OUTLINE} strokeWidth={3.8} fill="none" strokeLinecap="round" />
+          <path d="M 6 -33 Q 8 -41 13 -39" stroke="#f6f1fc" strokeWidth={2.2} fill="none" strokeLinecap="round" />
+          <g transform="translate(34 2) scale(1.15)">
+            <path d="M 0 0 C -4 -7 -12 -6 -11 0 C -12 6 -4 7 0 0 Z M 0 0 C 4 -7 12 -6 11 0 C 12 6 4 7 0 0 Z" fill="#ffc6df" {...thin} />
+            <circle r={6} fill={`url(#${u}-bpearl)`} {...thin} />
+            <circle cx={-2} cy={-2.2} r={1.9} fill="#fff" />
+          </g>
+          <path d={SPARKLE_D} transform="translate(-36 -22) scale(0.5)" fill="#fff" stroke="#c9d7f5" strokeWidth={0.6} />
+          <path d={SPARKLE_D} transform="translate(46 -14) scale(0.4)" fill="#e6f4ff" />
+        </g>
+      );
+    }
     default:
       return null;
   }
@@ -1245,6 +1290,32 @@ export function EarringPart({ id }: { id: string }) {
   }
 }
 
+/** A tiny velvet bat on a gold clip, centred on the body, about 40 units wide. */
+export function BatClip() {
+  const wing = "M -3 -2 C -7 -10 -15 -12 -20 -8 C -19 -5 -18 -2 -16 0 Q -14 -2 -12 1 Q -10 -1 -8 3 Q -6 1 -3 4 Z";
+  return (
+    <g>
+      <path d="M -9 6.5 L 9 6.5" stroke={OUTLINE} strokeWidth={3.2} strokeLinecap="round" />
+      <path d="M -9 6.5 L 9 6.5" stroke="#f0c76e" strokeWidth={1.8} strokeLinecap="round" />
+      {[1, -1].map((sx) => (
+        <g key={sx} transform={sx === -1 ? "scale(-1 1)" : undefined}>
+          <path d={wing} fill="#5a3f78" stroke={OUTLINE} strokeWidth={1.1} strokeLinejoin="round" />
+          <path d="M -4 -1 C -8 -6 -13 -8 -17 -7" stroke="#8b6fb0" strokeWidth={1} fill="none" strokeLinecap="round" />
+          <path d="M -8 -2 L -9 2 M -13 -3 L -13 0" stroke="#3d2a55" strokeWidth={0.7} strokeLinecap="round" />
+        </g>
+      ))}
+      <path d="M -3.4 -3 L -4 -8 L -1.4 -5 Z M 3.4 -3 L 4 -8 L 1.4 -5 Z" fill="#4a3264" stroke={OUTLINE} strokeWidth={0.9} strokeLinejoin="round" />
+      <ellipse cx={0} cy={0.6} rx={4.4} ry={5} fill="#4a3264" stroke={OUTLINE} strokeWidth={1.1} />
+      <path d="M -2.6 -2.6 Q -1 -4 1 -3.6" stroke="#8b6fb0" strokeWidth={0.8} fill="none" strokeLinecap="round" />
+      <circle cx={-1.6} cy={0} r={0.85} fill="#fff" />
+      <circle cx={1.6} cy={0} r={0.85} fill="#fff" />
+      <ellipse cx={-2.8} cy={2} rx={1.1} ry={0.6} fill="#ff8fbf" opacity={0.8} />
+      <ellipse cx={2.8} cy={2} rx={1.1} ry={0.6} fill="#ff8fbf" opacity={0.8} />
+      <path d="M -0.8 2.2 L 0 3.2 L 0.8 2.2" stroke="#fff" strokeWidth={0.5} fill="none" />
+    </g>
+  );
+}
+
 /** Hair accessories, origin at their anchor point on the head. */
 export function HairAccPart({ id }: { id: string }) {
   switch (id) {
@@ -1302,6 +1373,17 @@ export function HairAccPart({ id }: { id: string }) {
           <path d="M -4 -2 Q 0 -4 4 -2" stroke="#1d1722" strokeWidth={2} fill="none" />
           <path d="M -25 -3 L -19 -4 M 13 -4 L 23 -3" stroke="#ff9fcb" strokeWidth={1.6} strokeLinecap="round" opacity={0.85} />
           <path d="M -24 1 L -15 -2" stroke="#9be8d8" strokeWidth={1} strokeLinecap="round" opacity={0.7} />
+        </g>
+      );
+    case "hair_bat_clips":
+      return (
+        <g>
+          <g transform="translate(-41 6) rotate(-28) scale(1.15)">
+            <BatClip />
+          </g>
+          <g transform="translate(40 2) rotate(24) scale(1.05)">
+            <BatClip />
+          </g>
         </g>
       );
     default:
@@ -1820,7 +1902,7 @@ export interface WitchProps {
 const EAR_L: Pt = [57, 110];
 const EAR_R: Pt = [143, 110];
 
-const HAT_IDS = new Set(["hat_sun_pink", "hat_witch_pink", "hat_pearl_crown", "hat_sun_straw", "hat_crescent", "hat_flower_crown", "hat_beanie_black", "hat_crystal_tiara"]);
+const HAT_IDS = new Set(["hat_sun_pink", "hat_witch_pink", "hat_pearl_crown", "hat_sun_straw", "hat_crescent", "hat_flower_crown", "hat_beanie_black", "hat_crystal_tiara", "hat_snow_pearl"]);
 
 export function Witch({ characterId, look, equipped, mood, size = 220, animate = true, action = null, className, title }: WitchProps) {
   const u = safeId(useId());
@@ -1864,7 +1946,7 @@ export function Witch({ characterId, look, equipped, mood, size = 220, animate =
 
   const label = title ?? `${characterId} feeling ${mood}`;
   const hat = equipped.hat && HAT_IDS.has(equipped.hat) ? equipped.hat : undefined;
-  const hairAccPos: Record<string, Pt> = { hair_shell_clip: [140, 64], hair_bow_pink: [62, 52], hair_starfish: [141, 66], hair_sunglasses: [100, 50], hair_moon_pins: [100, 60] };
+  const hairAccPos: Record<string, Pt> = { hair_shell_clip: [140, 64], hair_bow_pink: [62, 52], hair_starfish: [141, 66], hair_sunglasses: [100, 50], hair_moon_pins: [100, 60], hair_bat_clips: [100, 60] };
   const acc = equipped.hair_acc && hairAccPos[equipped.hair_acc] ? equipped.hair_acc : undefined;
   // A wide hat sits where shades or a top bow would go, so tuck those away.
   const accHidden = acc && hat && (acc === "hair_sunglasses" || acc === "hair_bow_pink") && hat !== "hat_pearl_crown" && hat !== "hat_crystal_tiara" && hat !== "hat_flower_crown";
