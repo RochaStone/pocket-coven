@@ -7,7 +7,11 @@ import { MiniWitch } from "@/components/art/Witch";
 import { LOCATIONS } from "@/lib/game/catalog";
 import { moodFromStats } from "@/lib/game/logic";
 import { useGame } from "./GameContext";
+import { AlertsCard } from "./AlertsCard";
+import { GiftsWaiting } from "./Gifts";
+import { CovenGoalCard, OracleDraw } from "./Rituals";
 import { Tutorial } from "./Tutorial";
+import { play } from "@/lib/sound";
 
 // Small avatars of every witch at their last known location (online or not).
 export function useOccupants(world: "shell" | "kairos") {
@@ -34,7 +38,7 @@ export function useOccupants(world: "shell" | "kairos") {
 }
 
 export function WorldView() {
-  const { go } = useGame();
+  const { go, state, setGiftsOpen, refresh } = useGame();
   const [open, setOpen] = useState(false);
   const occupants = useOccupants("shell");
   useEffect(() => {
@@ -46,14 +50,22 @@ export function WorldView() {
     <div className="flex flex-col items-center gap-3 px-3 pb-4">
       <div className="relative flex w-full justify-center overflow-hidden rounded-[32px] px-1 py-4">
         <ShellNightSky />
-        <ShellCompact open={open} onToggle={() => setOpen((o) => !o)}>
+        <ShellCompact open={open} onToggle={() => { play("shell"); setOpen((o) => !o); }}>
           <WorldMap
             onSelect={(id) => (id === "kairos" ? go({ kind: "kairos" }) : go({ kind: "location", id }))}
             occupants={occupants}
           />
         </ShellCompact>
       </div>
-      {open && <Tutorial />}
+      {open && (
+        <>
+          <GiftsWaiting onOpen={() => setGiftsOpen(true)} />
+          <Tutorial />
+          <OracleDraw />
+          <CovenGoalCard />
+          <AlertsCard pushEnabled={state.push_enabled} onChange={() => refresh()} />
+        </>
+      )}
     </div>
   );
 }

@@ -75,6 +75,7 @@ export const CHARACTERS: CharacterDef[] = [
 
 const W = (id: string, name: string, category: ItemDef["category"], slot: ItemDef["slot"], price: number | undefined, rarity: ItemDef["rarity"], description: string): ItemDef => ({ id, name, category, slot, price, rarity, description });
 const P = (id: string, name: string, category: ItemDef["category"], price: number | undefined, rarity: ItemDef["rarity"], description: string): ItemDef => ({ id, name, category, price, rarity, description, placeable: true });
+const seasonal = (item: ItemDef, months: number[]): ItemDef => ({ ...item, season: months });
 
 export const ITEMS: ItemDef[] = [
   // Outfits
@@ -152,6 +153,15 @@ export const ITEMS: ItemDef[] = [
   P("col_talisman_eye", "Evil-Eye Talisman", "collectible", undefined, "rare", "Watches your back so you don't have to."),
   P("col_golden_scallop", "Golden Scallop", "collectible", undefined, "mythic", "The rarest shell in the lagoon."),
   P("col_glowshroom", "Glowshroom Cap", "collectible", undefined, "common", "A tiny violet mushroom that hums."),
+  // Rewards from moon ceremonies and coven goals (found, never sold)
+  P("col_full_moon_pearl", "Full Moon Pearl", "collectible", undefined, "mythic", "Only rises from a full moon ceremony. Glows silver."),
+  P("col_new_moon_shard", "New Moon Shard", "collectible", undefined, "mythic", "A sliver of dark sky, gifted by the new moon."),
+  P("col_coven_charm", "Coven Charm", "collectible", undefined, "mythic", "Five tiny shells on one gold thread. Earned together."),
+  // Seasonal (shop and daily gifts only in their months)
+  seasonal(P("decor_pumpkin_lantern", "Moonlit Pumpkin Lantern", "decor", 60, "rare", "A pink pumpkin with a crescent-moon grin."), [10]),
+  seasonal(W("hair_bat_clips", "Bat Wing Clips", "hair_acc", "hair_acc", 45, "rare", "Tiny velvet bat wings. Spooky, but make it cute."), [10]),
+  seasonal(P("decor_coral_tree", "Coral Festive Tree", "decor", 80, "rare", "Pink coral strung with pearls and starlight."), [12]),
+  seasonal(W("hat_snow_pearl", "Snow Pearl Beret", "hat", "hat", 70, "rare", "Fluffy white beret with a single pearl."), [12]),
 ];
 
 export const LOCATIONS: LocationDef[] = [
@@ -273,6 +283,9 @@ export const ACTIVITIES: ActivityDef[] = [
 export const SHARED_EVENTS = {
   moon_ritual: { name: "Coven Moon Ritual", locationId: "moon_deck", minParticipants: 2, effects: { magic: 30, social: 25, joy: 10 }, pearls: 30, xp: 25, lootItemId: "col_moonstone" },
   sound_bath: { name: "Group Sound Bath", locationId: "kairos_sound", minParticipants: 2, effects: { magic: 25, energy: 20, social: 20 }, pearls: 25, xp: 20, lootItemId: "col_amethyst" },
+  // Only startable while the real moon is full / new (about 3 nights each cycle).
+  full_moon: { name: "Full Moon Ceremony", locationId: "moon_deck", minParticipants: 2, effects: { magic: 40, social: 30, joy: 20 }, pearls: 60, xp: 40, lootItemId: "col_full_moon_pearl", moonPhase: "full" },
+  new_moon: { name: "New Moon Intentions", locationId: "moon_deck", minParticipants: 2, effects: { magic: 35, energy: 20, social: 25 }, pearls: 50, xp: 35, lootItemId: "col_new_moon_shard", moonPhase: "new" },
 } as const;
 export type SharedEventKind = keyof typeof SHARED_EVENTS;
 
@@ -284,6 +297,52 @@ export const ACHIEVEMENTS = [
   { id: "fashionista", name: "Fashion Familiar", description: "Wear five accessories at once." },
   { id: "interior_witch", name: "Interior Witch", description: "Place five items in your room." },
   { id: "pearl_hoarder", name: "Pearl Hoarder", description: "Hold 300 pearls at once." },
+  { id: "generous_witch", name: "Generous Witch", description: "Send five gifts to the coven." },
+  { id: "oracle_devotee", name: "Oracle Devotee", description: "Draw seven oracle cards." },
+  { id: "moon_child", name: "Moon Child", description: "Complete a full or new moon ceremony." },
+] as const;
+
+// Treats a witch can send a friend. The sender pays; the recipient gets the effects when they open it.
+export const GIFT_TREATS = [
+  { id: "treat_matcha", name: "Strawberry iced matcha", cost: 8, effects: { nourishment: 15, joy: 15, energy: 10 } },
+  { id: "treat_broth", name: "Bone broth", cost: 6, effects: { nourishment: 30, energy: 5 } },
+  { id: "treat_pancakes", name: "Pearl pancakes", cost: 5, effects: { nourishment: 25, joy: 8 } },
+  { id: "treat_bouquet", name: "Frangipani bouquet", cost: 10, effects: { joy: 25, magic: 5 } },
+] as const;
+
+// Weekly shared goals, rotating by ISO week. Everyone in the coven is rewarded on completion.
+export const COVEN_GOALS = [
+  { kind: "matcha", name: "Matcha Marathon", description: "Brew strawberry iced matchas together", target: 30 },
+  { kind: "rituals", name: "Ritual Week", description: "Complete coven ceremonies together", target: 3 },
+  { kind: "gifts", name: "Generous Tides", description: "Send gifts to each other", target: 15 },
+  { kind: "kairos", name: "Kairos Era", description: "Take Kairos classes and swims", target: 25 },
+] as const;
+export const COVEN_GOAL_REWARD = { pearls: 40, itemId: "col_coven_charm" } as const;
+
+// One card per witch per day. Messages are second person so they suit any pronouns.
+export const ORACLE_CARDS = [
+  { id: "pearl", name: "The Pearl", symbol: "pearl", message: "What irritated you is quietly becoming something precious. Let it." },
+  { id: "moon", name: "The Moon", symbol: "moon", message: "Trust the half you cannot see. It is still there." },
+  { id: "shell", name: "The Shell", symbol: "shell", message: "Retreat is allowed. Rest is allowed. Return glowing." },
+  { id: "tide", name: "The Tide", symbol: "tide", message: "What went out is coming back in. Leave the door open." },
+  { id: "star", name: "The Star", symbol: "star", message: "Make the wish out loud today. Someone in the coven will hear it." },
+  { id: "matcha", name: "The Matcha", symbol: "matcha", message: "Nourish first, decide second. Strawberry optional, but advised." },
+  { id: "crown", name: "The Crown", symbol: "crown", message: "Act like the sovereign you are. Nobody needs to approve." },
+  { id: "key", name: "The Key", symbol: "key", message: "The answer is in something you already own. Look again." },
+  { id: "mirror", name: "The Mirror", symbol: "mirror", message: "Say the kind thing you would say to a friend, to yourself." },
+  { id: "flame", name: "The Flame", symbol: "flame", message: "Small fire, steady fire. Tend one thing today." },
+  { id: "butterfly", name: "The Butterfly", symbol: "butterfly", message: "You are mid-change. Messy is part of the magic." },
+  { id: "cat", name: "The Familiar", symbol: "cat", message: "Follow your instincts like a cat follows the sun." },
+  { id: "crystal", name: "The Crystal", symbol: "crystal", message: "Clarity arrives when you stop shaking the snow globe." },
+  { id: "palm", name: "The Palm", symbol: "palm", message: "Bend, do not break. Then sway like you meant it." },
+  { id: "sun", name: "The Sun", symbol: "sun", message: "Say yes to the warm thing. Joy counts as productivity." },
+  { id: "lantern", name: "The Lantern", symbol: "lantern", message: "You only need to see the next step. Light it." },
+  { id: "mushroom", name: "The Glowshroom", symbol: "mushroom", message: "Growth is happening where you cannot see it yet." },
+  { id: "compact", name: "The Compact", symbol: "compact", message: "Your whole world fits in your palm today. Keep it close." },
+  { id: "comet", name: "The Comet", symbol: "comet", message: "Something fast and bright is heading your way. Look up." },
+  { id: "rose", name: "The Rose", symbol: "rose", message: "Softness is a strength. So are the thorns." },
+  { id: "eye", name: "The Eye", symbol: "eye", message: "You already know. Stop asking everyone else." },
+  { id: "wave", name: "The Wave", symbol: "wave", message: "Ride it, do not fight it. Then tell the coven how it went." },
 ] as const;
 
 export const GAME_CONFIG = {
@@ -292,6 +351,7 @@ export const GAME_CONFIG = {
   decay_max_hours: 72,
   daily_pearls: 30,
   daily_loot: ["col_spiral_shell", "col_sea_glass_aqua", "col_rose_quartz", "col_amethyst"],
+  gift_daily_limit: 12,
   starting_pearls: 120,
   chat_rate_limit: { messages: 5, seconds: 10 },
   visit_social_bonus: 10,

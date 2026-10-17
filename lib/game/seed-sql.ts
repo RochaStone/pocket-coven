@@ -1,4 +1,4 @@
-import { ACHIEVEMENTS, ACTIVITIES, CHARACTERS, GAME_CONFIG, ITEMS, LOCATIONS, SHARED_EVENTS } from "./catalog.ts";
+import { ACHIEVEMENTS, ACTIVITIES, CHARACTERS, COVEN_GOAL_REWARD, COVEN_GOALS, GAME_CONFIG, GIFT_TREATS, ITEMS, LOCATIONS, ORACLE_CARDS, SHARED_EVENTS } from "./catalog.ts";
 
 export const FOUNDING_COVEN_ID = "00000000-0000-4000-8000-000000000001";
 
@@ -18,8 +18,12 @@ export function buildSeedSql(): string {
     "",
   ];
 
-  for (const [key, value] of Object.entries({ ...GAME_CONFIG, shared_events: SHARED_EVENTS, day_timezone: "Asia/Makassar" })) {
+  for (const [key, value] of Object.entries({ ...GAME_CONFIG, day_timezone: "Asia/Makassar" })) {
     lines.push(`insert into public.game_config (key, value) values (${q(key)}, ${j(value)}) on conflict (key) do nothing;`);
+  }
+  // Content-shaped config is always refreshed from the catalog (not admin-tunable).
+  for (const [key, value] of Object.entries({ shared_events: SHARED_EVENTS, gift_treats: GIFT_TREATS, coven_goals: COVEN_GOALS, coven_goal_reward: COVEN_GOAL_REWARD, oracle_cards: ORACLE_CARDS.map((c) => c.id) })) {
+    lines.push(`insert into public.game_config (key, value) values (${q(key)}, ${j(value)}) on conflict (key) do update set value = excluded.value;`);
   }
   lines.push("");
 
@@ -29,7 +33,7 @@ export function buildSeedSql(): string {
   lines.push("");
 
   for (const i of ITEMS) {
-    lines.push(`insert into public.items (id, name, category, slot, price, placeable, rarity, description) values (${q(i.id)}, ${q(i.name)}, ${q(i.category)}, ${q(i.slot)}, ${n(i.price)}, ${b(i.placeable)}, ${q(i.rarity)}, ${q(i.description)}) on conflict (id) do update set name = excluded.name, category = excluded.category, slot = excluded.slot, price = excluded.price, placeable = excluded.placeable, rarity = excluded.rarity, description = excluded.description;`);
+    lines.push(`insert into public.items (id, name, category, slot, price, placeable, rarity, description, season) values (${q(i.id)}, ${q(i.name)}, ${q(i.category)}, ${q(i.slot)}, ${n(i.price)}, ${b(i.placeable)}, ${q(i.rarity)}, ${q(i.description)}, ${i.season ? `array[${i.season.join(", ")}]::int[]` : "null"}) on conflict (id) do update set name = excluded.name, category = excluded.category, slot = excluded.slot, price = excluded.price, placeable = excluded.placeable, rarity = excluded.rarity, description = excluded.description, season = excluded.season;`);
   }
   lines.push("");
 

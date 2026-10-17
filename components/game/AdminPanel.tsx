@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { MiniWitch } from "@/components/art/Witch";
 import { api, GameError } from "@/lib/game/api";
+import type { ActivityRow } from "@/lib/game/state";
 import { ITEMS } from "@/lib/game/catalog";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { NavIcon } from "./Icons";
@@ -19,6 +20,7 @@ export function AdminPanel({ covenId, siteUrl }: { covenId: string; siteUrl: str
   const [items, setItems] = useState<{ id: string; price: number | null; active: boolean }[]>([]);
   const [fresh, setFresh] = useState<Record<string, string>>({});
   const [note, setNote] = useState<string | null>(null);
+  const [activity, setActivity] = useState<ActivityRow[]>([]);
 
   const load = useCallback(async () => {
     const [c, i, m, g, it] = await Promise.all([
@@ -33,6 +35,7 @@ export function AdminPanel({ covenId, siteUrl }: { covenId: string; siteUrl: str
     setMsgs((m.data ?? []) as Msg[]);
     setConfig((g.data ?? []).filter((x) => x.key !== "shared_events"));
     setItems(it.data ?? []);
+    setActivity(await api.admin.activity().catch(() => []));
   }, [supabase, covenId]);
   useEffect(() => {
     // Initial fetch from Supabase; state is set after the network round trip.
@@ -116,6 +119,39 @@ export function AdminPanel({ covenId, siteUrl }: { covenId: string; siteUrl: str
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="pearl-panel p-4">
+        <h2 className="mb-1 font-[family-name:var(--font-display)] text-lg font-semibold">Who played when</h2>
+        <p className="mb-2 text-xs text-ink/60">Last 7 days. Use this to see whether the coven is coming back before building more.</p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="text-ink/55">
+              <tr>
+                <th className="py-1 pr-2">Witch</th>
+                <th className="py-1 pr-2">Last seen</th>
+                <th className="py-1 pr-2">Days active</th>
+                <th className="py-1 pr-2">Actions</th>
+                <th className="py-1 pr-2">Chats</th>
+                <th className="py-1 pr-2">Gifts</th>
+                <th className="py-1">Alerts</th>
+              </tr>
+            </thead>
+            <tbody>
+              {activity.map((a) => (
+                <tr key={a.id} className="border-t border-shell-100">
+                  <td className="py-1.5 pr-2 font-bold">{a.name}</td>
+                  <td className="py-1.5 pr-2">{!a.claimed ? "not joined" : a.last_seen ? new Date(a.last_seen).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" }) : "never"}</td>
+                  <td className="py-1.5 pr-2">{a.days_active_7d} / 7</td>
+                  <td className="py-1.5 pr-2">{a.actions_7d} <span className="text-ink/45">({a.actions_today} today)</span></td>
+                  <td className="py-1.5 pr-2">{a.chats_7d}</td>
+                  <td className="py-1.5 pr-2">{a.gifts_sent_7d}</td>
+                  <td className="py-1.5">{a.alerts_on ? "on" : "off"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <section className="pearl-panel p-4">

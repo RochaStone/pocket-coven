@@ -7,7 +7,9 @@ import { api } from "@/lib/game/api";
 import { itemById } from "@/lib/game/catalog";
 import type { MyState } from "@/lib/game/state";
 import { CovenView } from "./CovenView";
-import { GameProvider, useGame } from "./GameContext";
+import { GameProvider, useGame, type View } from "./GameContext";
+import { GiftComposer, GiftInbox } from "./Gifts";
+import { locationById } from "@/lib/game/catalog";
 import { Dock, Hud, Toasts, TreasureModal } from "./Hud";
 import { PearlIcon } from "./Icons";
 import { LocationView } from "./LocationView";
@@ -16,9 +18,11 @@ import { markTutorial } from "./Tutorial";
 import { Wardrobe } from "./Wardrobe";
 import { KairosView, WorldView } from "./WorldView";
 
-export default function Game({ initial }: { initial: MyState }) {
+export default function Game({ initial, go }: { initial: MyState; go?: string }) {
+  const initialView: View | undefined = !go || go === "gifts" ? undefined : go === "kairos" ? { kind: "kairos" } : locationById(go) ? { kind: "location", id: go } : undefined;
   return (
-    <GameProvider initial={initial}>
+    <GameProvider initial={initial} initialView={initialView}>
+      <GiftsOnArrival open={go === "gifts"} />
       <Shell />
     </GameProvider>
   );
@@ -55,7 +59,26 @@ function Shell() {
       <Toasts />
       <TreasureModal />
       <DailyReward />
+      <GiftSheets />
     </div>
+  );
+}
+
+function GiftsOnArrival({ open }: { open: boolean }) {
+  const { setGiftsOpen } = useGame();
+  useEffect(() => {
+    if (open) setGiftsOpen(true);
+  }, [open, setGiftsOpen]);
+  return null;
+}
+
+function GiftSheets() {
+  const { giftsOpen, setGiftsOpen, composeTo, setComposeTo } = useGame();
+  return (
+    <AnimatePresence>
+      {giftsOpen && <GiftInbox key="inbox" onClose={() => setGiftsOpen(false)} />}
+      {composeTo && <GiftComposer key="compose" to={composeTo} onClose={() => setComposeTo(null)} />}
+    </AnimatePresence>
   );
 }
 

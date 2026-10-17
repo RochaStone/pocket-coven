@@ -135,6 +135,27 @@ test("five-witch coven core loop: invites, claims, chat, presence, shared ritual
   await expect(rocha.page.getByText("2 online")).toBeVisible();
   await shot(rocha.page, "06-rocha-coven");
 
+  // 9. Gifting: Rocha sends Lizz a matcha; Lizz gets a live alert and opens it.
+  await rocha.page.locator("li", { hasText: "The Lesbian Witch" }).getByRole("button", { name: "Send gift" }).click();
+  await rocha.page.getByPlaceholder(/favourite chaos witch/i).fill("for my favourite chaos witch");
+  await rocha.page.getByRole("button", { name: /send gift \(8 pearls\)/i }).click();
+  await expect(rocha.page.getByText(/gift sent/i)).toBeVisible();
+  await expect(lizz.page.getByText(/Rocha sent you a gift/i)).toBeVisible();
+  await lizz.page.getByRole("button", { name: /^Open$/ }).click();
+  await lizz.page.getByRole("button", { name: /tap to open/i }).first().click();
+  await expect(lizz.page.getByText("for my favourite chaos witch").first()).toBeVisible();
+  await shot(lizz.page, "07-lizz-gift");
+  await lizz.page.getByRole("button", { name: "Close" }).click();
+
+  // 10. Daily oracle on the world screen.
+  await lizz.page.getByRole("button", { name: /^Shell$/ }).click();
+  await lizz.page.getByRole("button", { name: /draw today's oracle card/i }).click();
+  await lizz.page.getByRole("button", { name: /draw my card/i }).click();
+  await expect(lizz.page.getByRole("button", { name: /share with the coven/i })).toBeVisible();
+  await shot(lizz.page, "08-lizz-oracle");
+  await lizz.page.getByRole("button", { name: /share with the coven/i }).click();
+  await expect(rocha.page.getByText(/drew The /).first()).toBeVisible();
+
   for (const s of [rocha, lizz]) {
     const real = s.errors.filter((e) => !/favicon|Download the React DevTools/i.test(e));
     expect(real, `console errors: ${real.join("\n")}`).toEqual([]);

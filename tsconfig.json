@@ -38,6 +38,7 @@
   ],
   "exclude": [
     "supabase/functions",
+    "scripts/tmp-*",
     "node_modules"
   ]
 }

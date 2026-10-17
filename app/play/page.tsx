@@ -6,12 +6,13 @@ import { supabaseServer } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function PlayPage() {
+export default async function PlayPage({ searchParams }: { searchParams: Promise<{ go?: string }> }) {
+  const { go } = await searchParams;
   if (!isConfigured()) redirect("/");
   const supabase = await supabaseServer();
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) redirect("/");
   const { data, error } = await supabase.rpc("get_my_state");
   if (error || !data) redirect("/");
-  return <Game initial={data as MyState} />;
+  return <Game initial={data as MyState} go={go} />;
 }

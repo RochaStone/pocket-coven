@@ -11,6 +11,7 @@ import { formatSeconds, moodFromStats, moodLine } from "@/lib/game/logic";
 import type { AnimationKey } from "@/lib/game/types";
 import { Chat, ReactionBar } from "./Chat";
 import { EventPanel } from "./EventPanel";
+import { MoonStatus } from "./Rituals";
 import { useGame } from "./GameContext";
 import { NavIcon } from "./Icons";
 
@@ -21,7 +22,10 @@ export function LocationView({ id }: { id: string }) {
   const loc = locationById(id);
   const me = state.character;
   const activities = ACTIVITIES.filter((a) => a.locationId === id && !(a.adultOnly && me.baby_aesthetic));
-  const eventKind = (Object.entries(SHARED_EVENTS).find(([, e]) => e.locationId === id)?.[0] ?? null) as keyof typeof SHARED_EVENTS | null;
+  // Coven ceremonies held here; moon ceremonies only while the real moon is full or new.
+  const eventKinds = (Object.entries(SHARED_EVENTS) as [keyof typeof SHARED_EVENTS, (typeof SHARED_EVENTS)[keyof typeof SHARED_EVENTS]][])
+    .filter(([, e]) => e.locationId === id && (!("moonPhase" in e) || e.moonPhase === state.moon.window))
+    .map(([k]) => k);
 
   // Other witches here: online and here now, or here within the last few minutes.
   const others = useMemo(
@@ -103,7 +107,10 @@ export function LocationView({ id }: { id: string }) {
 
       <p className="pearl-panel px-4 py-2 text-center text-sm font-semibold text-ink/80">{moodLine(me.name, me.pronouns, state.mood)}</p>
 
-      {eventKind && <EventPanel kind={eventKind} />}
+      {id === "moon_deck" && <MoonStatus />}
+      {eventKinds.map((k) => (
+        <EventPanel key={k} kind={k} />
+      ))}
 
       {id === "lounge" && (
         <section className="pearl-panel p-3">

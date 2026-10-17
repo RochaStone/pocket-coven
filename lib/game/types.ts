@@ -58,6 +58,7 @@ export interface ItemDef {
   slot?: Slot; // wearables only
   price?: number; // pearls; undefined = not sold, found only
   placeable?: boolean; // can go in a room
+  season?: number[]; // months (1-12) when it can be bought or found; undefined = always
   rarity: "common" | "rare" | "mythic";
   description: string;
 }
