@@ -1,6 +1,6 @@
 "use client";
 
-import type { KeyboardEvent, ReactNode } from "react";
+import { useState, type KeyboardEvent, type ReactNode } from "react";
 import { locationById } from "@/lib/game/catalog";
 import { ArtKeyframes, Frangipani, Glint, PLUM, Palm, Pearl, lobedPath, rng, star5Path, starPath, useArtId } from "./Sparkles";
 
@@ -69,6 +69,33 @@ const PLAQUES: Record<string, { lines: string[]; cx?: number; cy: number }> = {
   lagoon: { lines: ["MERMAID LAGOON"], cy: 470 },
   beach: { lines: ["SHELL BEACH"], cy: 304 },
 };
+
+/** Painted map (Higgsfield, production `art` bucket). The drawn map stays underneath as the fallback. */
+const PAINTED_MAP_URL = "https://ogvydqsynyksgbymptzm.supabase.co/storage/v1/object/public/art/map/v1/shell.jpg";
+/** The painting (880 x 1168) is scaled so its shell interior fills the 400 x 500 recess. */
+const PAINTED_IMAGE = { x: -30, y: -24.4, w: 460, h: 610.5 };
+/** Tap spots over each painted place: centre in SVG units. */
+const PAINTED_SPOTS: Record<string, { cx: number; cy: number }> = {
+  palace: { cx: 200, cy: 92 },
+  moon_deck: { cx: 283, cy: 52 },
+  cafe: { cx: 90, cy: 165 },
+  grotto: { cx: 310, cy: 165 },
+  lagoon: { cx: 200, cy: 268 },
+  lounge: { cx: 318, cy: 330 },
+  reef: { cx: 72, cy: 348 },
+  beach: { cx: 326, cy: 425 },
+  kairos: { cx: 200, cy: 450 },
+};
+const PAINTED_ROOMS: Record<string, Rect> = Object.fromEntries(
+  Object.entries(PAINTED_SPOTS).map(([k, { cx, cy }]) => [k, { x: cx - 52, y: cy - 34, w: 104, h: 72 }]),
+);
+const toPercent = (r: Rect) => ({
+  x: +((r.x / VB_W) * 100).toFixed(2),
+  y: +((r.y / VB_H) * 100).toFixed(2),
+  w: +((r.w / VB_W) * 100).toFixed(2),
+  h: +((r.h / VB_H) * 100).toFixed(2),
+});
+const PAINTED_ROOMS_PCT = Object.fromEntries(Object.entries(PAINTED_ROOMS).map(([k, r]) => [k, toPercent(r)]));
 
 const ORDER = ["moon_deck", "palace", "cafe", "lounge", "grotto", "reef", "beach", "lagoon", "kairos"];
 
@@ -600,6 +627,8 @@ export function WorldMap({
 }) {
   const g = useArtId("wm");
   const r = rng(19);
+  const [painted, setPainted] = useState(false);
+  const roomsPct = painted ? PAINTED_ROOMS_PCT : WORLD_ROOMS;
   const skyStars = Array.from({ length: 22 }, () => ({ x: Math.round(r() * 4000) / 10, y: Math.round((4 + r() * 150) * 10) / 10, s: Math.round((1.2 + r() * 2) * 10) / 10 }));
 
   const handleKey = (id: string, locked: boolean) => (e: KeyboardEvent<SVGGElement>) => {
@@ -789,9 +818,21 @@ export function WorldMap({
           <Stairs x0={130} y0={284} x1={146} y1={372} steps={8} g={g} />
           <Stairs x0={286} y0={284} x1={266} y1={372} steps={8} g={g} />
 
+          <image
+            href={PAINTED_MAP_URL}
+            x={PAINTED_IMAGE.x}
+            y={PAINTED_IMAGE.y}
+            width={PAINTED_IMAGE.w}
+            height={PAINTED_IMAGE.h}
+            preserveAspectRatio="xMidYMid slice"
+            onLoad={() => setPainted(true)}
+            style={{ opacity: painted ? 1 : 0, transition: "opacity .5s ease" }}
+            pointerEvents="none"
+          />
+
           {/* rooms */}
           {ORDER.map((id) => {
-            const rect = ROOMS_UNITS[id];
+            const rect = painted ? PAINTED_ROOMS[id] : ROOMS_UNITS[id];
             const locked = lockedLocations.includes(id);
             const pl = PLAQUES[id];
             const hl = highlight === id;
@@ -810,7 +851,7 @@ export function WorldMap({
                 onKeyDown={handleKey(id, locked)}
               >
                 <rect x={rect.x} y={rect.y} width={rect.w} height={rect.h} fill="#fff" fillOpacity={0} />
-                {ART_UNITS[id] ? <g transform={fit(id)}>{art}</g> : art}
+                {!painted && (ART_UNITS[id] ? <g transform={fit(id)}>{art}</g> : art)}
                 {locked && (
                   <g>
                     <rect x={rect.x} y={rect.y} width={rect.w} height={rect.h} rx="8" fill="#efe2ff" opacity="0.62" />
@@ -825,11 +866,11 @@ export function WorldMap({
                   <rect x={rect.x + 1} y={rect.y + 1} width={rect.w - 2} height={rect.h - 2} rx="10" fill="#fff6c9" fillOpacity={0.12} stroke="#fff6c9" strokeWidth="5" filter={`url(#${g}-glow)`} />
                   <rect x={rect.x + 1} y={rect.y + 1} width={rect.w - 2} height={rect.h - 2} rx="10" fill="none" stroke="#fff" strokeWidth="1.6" strokeDasharray="1 5" strokeLinecap="round" />
                 </g>
-                <Plaque cx={pl.cx ?? rect.x + rect.w / 2} cy={pl.cy} lines={pl.lines} gid={g} />
+                <Plaque cx={painted ? rect.x + rect.w / 2 : (pl.cx ?? rect.x + rect.w / 2)} cy={painted ? rect.y + 8 : pl.cy} lines={pl.lines} gid={g} />
               </g>
             );
           })}
-          <Field />
+          {!painted && <Field />}
         </g>
         <path d={WORLD_SHELL_PATH} fill="none" stroke={PLUM} strokeOpacity="0.5" strokeWidth="1.5" />
       </svg>
@@ -838,7 +879,7 @@ export function WorldMap({
       {occupants && (
         <div className="pointer-events-none absolute inset-0">
           {Object.entries(occupants).map(([id, nodes]) => {
-            const rr = WORLD_ROOMS[id];
+            const rr = roomsPct[id];
             if (!rr || !nodes?.length) return null;
             return (
               <div
