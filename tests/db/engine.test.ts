@@ -5,7 +5,7 @@ import type pg from "pg";
 import { as, expectFail, freshDb, key, makeUser, rpc, serviceInvite } from "./harness";
 import { buildSeedSql } from "@/lib/game/seed-sql.ts";
 import { moodFromStats, projectStats } from "@/lib/game/logic.ts";
-import { GAME_CONFIG } from "@/lib/game/catalog.ts";
+import { CHARACTERS, GAME_CONFIG } from "@/lib/game/catalog.ts";
 import type { Stats } from "@/lib/game/types.ts";
 
 let pool: pg.Pool;
@@ -33,7 +33,7 @@ describe("seed", () => {
   });
   it("creates five unclaimed founding witches with starter wardrobes", async () => {
     const { rows } = await superSql("select id, owner_user_id from public.characters order by id");
-    expect(rows.map((r) => r.id)).toEqual(["cheryl", "dray", "lizz", "rocha", "veda"]);
+    expect(rows.map((r) => r.id)).toEqual(["cheryl", "christiana", "dray", "layla", "lizz", "rocha", "veda"]);
     expect(rows.every((r) => r.owner_user_id === null)).toBe(true);
     const inv = await superSql("select count(*)::int as n from public.inventory where character_id = 'lizz'");
     expect(inv.rows[0].n).toBeGreaterThan(4);
@@ -108,7 +108,7 @@ describe("invitations and ownership", () => {
     expect(await as(pool, stranger, "select * from public.chat_messages")).toHaveLength(0);
     expect(await as(pool, stranger, "select * from public.character_stats")).toHaveLength(0);
     await expectFail(rpc(pool, stranger, "get_my_state"), "no_character");
-    expect((await as(pool, lizz, "select id from public.characters")).length).toBe(5);
+    expect((await as(pool, lizz, "select id from public.characters")).length).toBe(CHARACTERS.length);
   });
 });
 

@@ -1,6 +1,6 @@
 // Shared contracts between the database, the game engine and the art layer.
 
-export const CHARACTER_IDS = ["rocha", "lizz", "dray", "cheryl", "veda"] as const;
+export const CHARACTER_IDS = ["rocha", "lizz", "dray", "cheryl", "veda", "christiana", "layla"] as const;
 export type CharacterId = (typeof CHARACTER_IDS)[number];
 
 export const STATS = ["nourishment", "energy", "joy", "magic", "social"] as const;
@@ -22,6 +22,7 @@ export const HAIR_STYLES = [
   "ethereal_long",
   "pixie",
   "space_buns",
+  "pigtails",
 ] as const;
 export type HairStyle = (typeof HAIR_STYLES)[number];
 

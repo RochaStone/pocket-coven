@@ -32,6 +32,9 @@ export const BUILDS: Record<CharacterId, Build> = {
   dray: { ...ADULT, sh: 23 },
   cheryl: { ...ADULT },
   veda: { ...ADULT, sh: 21.5, wa: 15 },
+  christiana: { ...ADULT, sh: 21.5 },
+  // Layla is a child: shorter, slighter, a touch more head.
+  layla: { sh: 16, wa: 13.5, hip: 15, sY: 142, waistY: 170, hipY: 178, footY: 222, legX: 6, armW: 7, corner: 8, andro: false, baby: false, headScale: 1.06 },
 };
 
 export const DEFAULT_BUILD = ADULT;
@@ -469,6 +472,66 @@ const OUTFITS: Record<string, OutfitDef> = {
       };
     },
   },
+  outfit_rosebud_tutu: {
+    sleeve: "tee",
+    sleeveFill: "#fff0f7",
+    shoes: "sneakers",
+    shoeColor: "#ff7fbf",
+    leggings: "#ffc6df",
+    draw: ({ b, u, mode }) => {
+      const hemY = mode === "tail" ? b.waistY + 5 : b.waistY + 17;
+      const hemW = mode === "tail" ? b.wa + 8 : b.hip + 11;
+      return {
+        lower: (
+          <g>
+            <defs>
+              <Grad id={`${u}-tutu`} stops={[[0, "#ff9ccb"], [1, "#ff6fb4"]]} />
+            </defs>
+            <path d={skirtD(b.waistY - 2, b.wa + 1, hemY + 2, hemW + 2, 8, 3)} fill="#ffd3e8" {...ol} />
+            <path d={skirtD(b.waistY - 2, b.wa + 1, hemY - 1, hemW, 8, 3)} fill={`url(#${u}-tutu)`} {...ol} />
+            <rect x={100 - b.wa - 1.5} y={b.waistY - 4} width={(b.wa + 1.5) * 2} height={4.5} rx={2} fill="#ff7fbf" {...thin} />
+            <Glitter pts={[[100 - hemW + 8, hemY - 6], [94, b.waistY + 6], [107, b.waistY + 9], [100 + hemW - 7, hemY - 5]]} />
+          </g>
+        ),
+        upper: (
+          <g>
+            <path d={garmentD(b, b.sY, b.waistY, b.wa)} fill="#fff0f7" {...ol} />
+            <path d={`M ${100 - 6} ${b.sY} Q 100 ${b.sY + 5} ${100 + 6} ${b.sY}`} fill="none" {...thin} />
+            <path d={HEART_D} transform={`translate(100 ${b.sY + 15}) scale(1.1)`} fill="#ff7fbf" {...thin} />
+          </g>
+        ),
+      };
+    },
+  },
+  outfit_rose_wrap: {
+    sleeve: "flutter",
+    sleeveFill: "#eaa7b3",
+    shoes: "sandals",
+    shoeColor: "#c98a6a",
+    draw: ({ b, u, mode }) => {
+      const hemY = mode === "tail" ? b.waistY + 6 : b.waistY + 44;
+      const hemW = mode === "tail" ? b.wa + 7 : b.hip + 8;
+      return {
+        lower: (
+          <g>
+            <defs>
+              <Grad id={`${u}-rose`} stops={[[0, "#eaa7b3"], [1, "#d98394"]]} />
+            </defs>
+            <path d={skirtD(b.waistY - 1, b.wa, hemY, hemW, 6, 3)} fill={`url(#${u}-rose)`} {...ol} />
+            <path d={`M ${100 + 4} ${b.waistY + 1} Q ${100 + 8} ${(b.waistY + hemY) / 2} ${100 + hemW - 6} ${hemY - 2}`} stroke="#c9707f" strokeWidth={1.1} fill="none" opacity={0.7} />
+          </g>
+        ),
+        upper: (
+          <g>
+            <path d={garmentD(b, b.sY + 1, b.waistY, b.wa)} fill="#eaa7b3" {...ol} />
+            <path d={`M ${100 - b.sh + 7} ${b.sY + 1} L ${100 + 5} ${b.waistY - 3} M ${100 + b.sh - 7} ${b.sY + 1} L ${100 - 2} ${b.sY + 18}`} stroke="#c9707f" strokeWidth={1.3} fill="none" />
+            <rect x={100 - b.wa - 1} y={b.waistY - 4} width={(b.wa + 1) * 2} height={4.5} rx={2} fill="#c9707f" {...thin} />
+            <circle cx={100 + b.wa - 3} cy={b.waistY - 1.8} r={2.4} fill="#f6d3d9" {...thin} />
+          </g>
+        ),
+      };
+    },
+  },
 };
 
 function defaultOutfit(id: CharacterId): OutfitDef {
@@ -884,6 +947,23 @@ const HAIR: Record<HairStyle, HairShape> = {
             <circle cx={x} cy={42} r={17} fill={`url(#${u}-hair)`} stroke={p.line} strokeWidth={1.8} />
             <path d={`M ${x - 10} ${40} Q ${x} ${28} ${x + 10} ${38} M ${x - 11} ${47} Q ${x} ${36} ${x + 12} ${46} M ${x - 6} ${53} Q ${x + 2} ${46} ${x + 10} ${52}`} stroke={p.shade} strokeWidth={1.2} fill="none" />
             <path d={`M ${x - 9} ${34} Q ${x - 3} ${28} ${x + 4} ${29}`} stroke={p.shine} strokeWidth={2.4} strokeLinecap="round" fill="none" opacity={0.85} />
+          </g>
+        ))}
+      </g>
+    ),
+    shine: "M 68 60 Q 100 44 132 60",
+  },
+  pigtails: {
+    // Two bunches tied high at the sides, drawn behind the head.
+    back: "M 56 78 C 32 84 22 116 26 146 C 28 164 38 176 46 172 C 41 162 47 152 45 138 C 43 118 50 100 62 90 Z" + " " + mirrorD("M 56 78 C 32 84 22 116 26 146 C 28 164 38 176 46 172 C 41 162 47 152 45 138 C 43 118 50 100 62 90 Z"),
+    strands: "M 36 110 C 30 128 36 146 34 160 M 164 110 C 170 128 164 146 166 160",
+    cap: "M 47 118 C 40 70 66 36 100 36 C 134 36 160 70 153 118 L 145 116 C 145 98 142 86 138 78" + fringe([[138, 78], [134, 95], [126, 74], [116, 91], [108, 72], [99, 93], [90, 72], [82, 90], [74, 74], [66, 94], [62, 80]]) + " C 58 88 55 100 55 116 Z",
+    extra: () => (
+      <g>
+        {[56, 144].map((x) => (
+          <g key={x}>
+            <circle cx={x} cy={80} r={6} fill="#ff7fbf" stroke={OUTLINE} strokeWidth={1.4} />
+            <circle cx={x - 1.8} cy={78} r={1.6} fill="#fff" opacity={0.85} />
           </g>
         ))}
       </g>

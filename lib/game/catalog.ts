@@ -71,6 +71,33 @@ export const CHARACTERS: CharacterDef[] = [
     equipped: { outfit: "outfit_mist_gown", hat: "hat_crystal_tiara", necklace: "neck_crystal", earrings: "ear_pearl_drop", companion: "pet_white_kitten" },
     starterItems: ["outfit_mist_gown", "hat_crystal_tiara", "neck_crystal", "ear_pearl_drop", "tail_lavender_moon", "pet_white_kitten", "furn_shell_vanity", "decor_mushroom_lamp"],
   },
+  {
+    id: "christiana",
+    name: "Christiana",
+    title: "The Rose Witch",
+    pronouns: SHE,
+    babyAesthetic: false,
+    isOwnerCharacter: false,
+    description: "Long brown hair, a dusty-rose wrap dress and a frangipani crown. Never far from her rosebud.",
+    personality: "Warm, steady, quietly magic. Remembers everyone's favourite treat.",
+    look: { skin: "#ecc3a6", hairColor: "#6b4428", hairStyle: "straight_long", eyeColor: "#6b4a2e" },
+    equipped: { outfit: "outfit_rose_wrap", hat: "hat_flower_crown", earrings: "ear_pearl_drop", necklace: "neck_pearls" },
+    starterItems: ["outfit_rose_wrap", "hat_flower_crown", "ear_pearl_drop", "neck_pearls", "tail_coral_sunset", "furn_coral_lamp", "decor_palm_pot"],
+  },
+  {
+    id: "layla",
+    name: "Layla",
+    title: "The Rosebud Witch",
+    pronouns: SHE,
+    // Child player: the baby flag also keeps every adults-only activity away from her.
+    babyAesthetic: true,
+    isOwnerCharacter: false,
+    description: "Long brown pigtails with pink bobbles, a twirly pink tutu, leggings made for adventures.",
+    personality: "Giggly, brave, pink about everything. Asks the best questions.",
+    look: { skin: "#ecc3a6", hairColor: "#6b4428", hairStyle: "pigtails", eyeColor: "#6b4a2e" },
+    equipped: { outfit: "outfit_rosebud_tutu" },
+    starterItems: ["outfit_rosebud_tutu", "hat_witch_pink", "hair_bow_pink", "tail_pink_aqua", "furn_oyster_bed", "decor_starfish_garland"],
+  },
 ];
 
 const W = (id: string, name: string, category: ItemDef["category"], slot: ItemDef["slot"], price: number | undefined, rarity: ItemDef["rarity"], description: string): ItemDef => ({ id, name, category, slot, price, rarity, description });
@@ -87,6 +114,8 @@ export const ITEMS: ItemDef[] = [
   W("outfit_mist_gown", "Mist Gown", "outfit", "outfit", 150, "rare", "Lavender chiffon that drifts like sea fog."),
   W("outfit_kairos_active", "Kairos Activewear", "outfit", "outfit", 80, "common", "Matching set. Pilates-ready, brunch-approved."),
   W("outfit_shell_suit", "Shell Tailored Suit", "outfit", "outfit", 160, "rare", "Sharp pearl-grey suit with a scallop lapel pin."),
+  W("outfit_rosebud_tutu", "Rosebud Tutu", "outfit", "outfit", 70, "common", "Pink tutu, heart tee, leggings built for running about."),
+  W("outfit_rose_wrap", "Rose Wrap Dress", "outfit", "outfit", 110, "common", "Dusty rose, flutter sleeves, ties with a pearl button."),
   W("outfit_overalls", "Sea-Glass Overalls", "outfit", "outfit", 70, "common", "Washed denim with sea-glass buttons."),
   // Tails
   W("tail_pink_aqua", "Pink Aqua Tail", "tail", "tail", 100, "common", "Shimmers pink to aqua as you swim."),
