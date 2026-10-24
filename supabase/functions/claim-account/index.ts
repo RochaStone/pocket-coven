@@ -49,8 +49,9 @@ Deno.serve(async (req) => {
   if (listErr) return fail(500, "server", "The shell could not finish creating your account. Try again.");
   const existing = users.users.find((u) => u.email?.toLowerCase() === email);
   if (!existing) return fail(400, "create_failed", "That account could not be created. Try a different email.");
-  const { data: owned } = await admin.from("characters").select("id").eq("owner_user_id", existing.id).maybeSingle();
-  if (owned) return fail(409, "account_exists", "This email already has a witch. Sign in with your password instead.");
+  const { data: owned, error: ownedErr } = await admin.from("characters").select("id").eq("owner_user_id", existing.id).limit(1);
+  if (ownedErr) return fail(500, "server", "The shell could not finish creating your account. Try again.");
+  if (owned.length > 0) return fail(409, "account_exists", "This email already has a witch. Sign in with your password instead.");
   const { error: updErr } = await admin.auth.admin.updateUserById(existing.id, { password, email_confirm: true });
   if (updErr) return fail(500, "server", "The shell could not finish creating your account. Try again.");
   return reply(200, { ok: true, created: false });

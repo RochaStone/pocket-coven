@@ -1,5 +1,7 @@
 "use client";
 import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
+import { api } from "@/lib/game/api";
 import { ItemIcon } from "@/components/art/ItemIcon";
 import { TreasureBurst } from "@/components/art/Sparkles";
 import { itemById } from "@/lib/game/catalog";
@@ -40,6 +42,33 @@ export function StatBar({ stat, value, compact }: { stat: StatKey; value: number
   );
 }
 
+// A family login (a parent and her child) owns more than one witch and can hop between them.
+function FamilySwitch() {
+  const { state, fail } = useGame();
+  const [working, setWorking] = useState(false);
+  const others = (state.family ?? []).filter((f) => f.id !== state.character.id);
+  if (others.length === 0) return null;
+  const go = async (id: string) => {
+    setWorking(true);
+    try {
+      await api.switchCharacter(id);
+      window.location.reload();
+    } catch (e) {
+      fail(e);
+      setWorking(false);
+    }
+  };
+  return (
+    <div className="mt-1 flex flex-wrap gap-1">
+      {others.map((o) => (
+        <button key={o.id} onClick={() => go(o.id)} disabled={working} className="rounded-full bg-shell-100 px-2.5 py-0.5 text-[11px] font-bold text-shell-500 ring-1 ring-shell-200">
+          {working ? "Switching..." : `Play as ${o.name}`}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function Hud() {
   const { state } = useGame();
   const lvlFloor = xpForLevel(state.stats.level);
@@ -53,6 +82,7 @@ export function Hud() {
             <span className="truncate font-[family-name:var(--font-display)] text-lg font-semibold leading-tight text-shell-500">{state.character.name}</span>
             <span className="truncate text-[11px] font-semibold text-ink/60">{state.character.title}</span>
           </div>
+          <FamilySwitch />
           <div className="mt-0.5 flex items-center gap-1.5 text-[11px] font-semibold">
             <span className="rounded-full bg-lilac-100 px-2 py-0.5 text-lilac-500">{MOOD_LABEL[state.mood]}</span>
             <span className="text-ink/60">Lv {state.stats.level}</span>

@@ -41,6 +41,7 @@ export interface MyState extends WitchPublic {
   push_enabled: boolean;
   moon: { phase: number; window: "full" | "new" | null };
   month: number;
+  family?: { id: string; name: string; title: string }[];
 }
 
 export interface Gift {

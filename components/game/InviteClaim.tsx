@@ -17,6 +17,7 @@ interface Peek {
   look?: Look;
   equipment?: Equipped;
   pronouns?: Pronouns;
+  bundle?: { character_id: string; name: string; title: string; look: Look; equipment: Equipped }[];
 }
 
 const REASON: Record<string, string> = {
@@ -58,6 +59,19 @@ export function InviteClaim({ token, peek, signedIn }: { token: string; peek: Pe
               {peek.title}
               {peek.pronouns ? ` · ${peek.pronouns.subject}/${peek.pronouns.object}` : ""}
             </p>
+            {peek.bundle && peek.bundle.length > 0 && (
+              <div className="mt-3 flex flex-col items-center">
+                <p className="title-script text-base text-lilac-500">and bringing along</p>
+                {peek.bundle.map((b) => (
+                  <div key={b.character_id} className="flex flex-col items-center">
+                    <Witch characterId={b.character_id as never} look={b.look} equipped={b.equipment ?? {}} mood={peek.valid ? "thriving" : "sleepy"} size={150} />
+                    <p className="font-[family-name:var(--font-display)] text-xl font-bold text-shell-500">{b.name}</p>
+                    <p className="text-xs font-semibold text-ink/65">{b.title}</p>
+                  </div>
+                ))}
+                <p className="mt-1 text-xs text-ink/60">One login plays both. Switch between them from the top of the screen.</p>
+              </div>
+            )}
           </>
         ) : (
           <h1 className="title-script text-2xl text-shell-500">A seashell invitation</h1>

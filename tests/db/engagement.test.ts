@@ -219,3 +219,35 @@ describe("pet names", () => {
     expect(s.character.look.hairStyle).toBe("pigtails");
   });
 });
+
+describe("family accounts", () => {
+  it("one family invite claims parent and child, and the login switches between them", async () => {
+    const mum = await makeUser(pool, "christiana@example.com");
+    const token = await serviceInvite(pool, "christiana");
+    await sql("update public.invitations set bundle = '{layla}' where character_id = 'christiana' and claimed_at is null");
+    const peek = await rpc(pool, mum, "peek_invite", [token]);
+    expect(peek.valid).toBe(true);
+    expect(peek.bundle.map((b: any) => b.name)).toEqual(["LaLa"]);
+
+    const claimed = await rpc(pool, mum, "claim_invite", [token]);
+    expect(claimed.character.id).toBe("christiana");
+    expect(claimed.family.map((f: any) => f.id).sort()).toEqual(["christiana", "layla"]);
+    expect((await rpc(pool, mum, "get_my_state")).character.id).toBe("christiana");
+
+    const lala = await rpc(pool, mum, "switch_character", ["layla"]);
+    expect(lala.character.id).toBe("layla");
+    expect((await rpc(pool, mum, "get_my_state")).character.id).toBe("layla");
+    // Actions now run as LaLa: naming her puppy lands on her, not her mum.
+    const named = await rpc(pool, mum, "name_pet", ["pet_pomeranian", "Biscuit"]);
+    expect(named.character.id).toBe("layla");
+
+    await expectFail(rpc(pool, mum, "switch_character", ["rocha"]), "not_yours");
+    await expectFail(rpc(pool, lizz, "switch_character", ["layla"]), "not_yours");
+    // The used family link cannot be claimed again.
+    const stranger = await makeUser(pool, "stranger2@example.com");
+    expect((await rpc(pool, stranger, "peek_invite", [token])).valid).toBe(false);
+    await expectFail(rpc(pool, stranger, "claim_invite", [token]), "invite_used");
+    // Ordinary invites stay one witch per account.
+    await expectFail(rpc(pool, mum, "claim_invite", [await serviceInvite(pool, "veda")]), "already_has_character");
+  });
+});

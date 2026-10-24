@@ -503,6 +503,35 @@ const OUTFITS: Record<string, OutfitDef> = {
       };
     },
   },
+  outfit_padel_set: {
+    sleeve: "cap",
+    sleeveFill: "#ffffff",
+    shoes: "sneakers",
+    shoeColor: "#ffffff",
+    draw: ({ b, mode }) => {
+      const hemY = mode === "tail" ? b.waistY + 5 : b.waistY + 22;
+      const hemW = mode === "tail" ? b.wa + 7 : b.hip + 7;
+      const pleats = [-0.6, -0.2, 0.2, 0.6].map((t) => 100 + t * hemW);
+      return {
+        lower: (
+          <g>
+            <path d={`M ${100 - b.wa - 1} ${b.waistY - 2} L ${100 + b.wa + 1} ${b.waistY - 2} L ${100 + hemW} ${hemY} L ${100 - hemW} ${hemY} Z`} fill="#ff8fc8" {...ol} />
+            <path d={pleats.map((x) => `M ${f(100 + (x - 100) * 0.55)} ${b.waistY + 1} L ${f(x)} ${hemY - 1}`).join(" ")} stroke="#e0609f" strokeWidth={1} fill="none" />
+            <rect x={100 - b.wa - 1.5} y={b.waistY - 4} width={(b.wa + 1.5) * 2} height={4} rx={2} fill="#ffffff" {...thin} />
+          </g>
+        ),
+        upper: (
+          <g>
+            <path d={garmentD(b, b.sY, b.waistY, b.wa)} fill="#ffffff" {...ol} />
+            <path d={`M ${100 - 8} ${b.sY} L 100 ${b.sY + 9} L ${100 + 8} ${b.sY} M 100 ${b.sY + 9} L 100 ${b.sY + 16}`} stroke="#ff7fbf" strokeWidth={1.4} fill="none" strokeLinejoin="round" />
+            <path d={`M ${100 - 9} ${b.sY - 1} L ${100 - 3} ${b.sY + 6} L ${100 - 11} ${b.sY + 4} Z M ${100 + 9} ${b.sY - 1} L ${100 + 3} ${b.sY + 6} L ${100 + 11} ${b.sY + 4} Z`} fill="#ffe3f1" {...thin} />
+            <path d={`M ${100 - b.sh + 4} ${b.sY + 22} L ${100 - b.wa} ${b.waistY - 4} M ${100 + b.sh - 4} ${b.sY + 22} L ${100 + b.wa} ${b.waistY - 4}`} stroke="#ff8fc8" strokeWidth={2} />
+            <circle cx={100 + 8} cy={b.sY + 18} r={2.6} fill="#d9f45a" {...thin} />
+          </g>
+        ),
+      };
+    },
+  },
   outfit_rose_wrap: {
     sleeve: "flutter",
     sleeveFill: "#eaa7b3",
@@ -1046,6 +1075,15 @@ function HairFront({ style, p, u, sp, curly }: { style: HairStyle; p: HairPalett
 /** Hats are drawn with the origin at the crown of the head (100, 40 in avatar space). */
 export function HatPart({ id, u }: { id: string; u: string }) {
   switch (id) {
+    case "hat_padel_visor":
+      return (
+        <g>
+          <path d="M -50 30 C -46 12 -24 6 0 6 C 24 6 46 12 50 30 L 44 31 C 40 18 22 13 0 13 C -22 13 -40 18 -44 31 Z" fill="#ffffff" {...ol} />
+          <path d="M -40 30 C -30 46 30 46 40 30 C 26 36 -26 36 -40 30 Z" fill="#ff7fbf" {...ol} />
+          <path d="M -30 36 C -14 41 14 41 30 36" stroke="#fff" strokeWidth={1.4} fill="none" opacity={0.6} strokeLinecap="round" />
+          <circle cx={0} cy={10} r={3.2} fill="#d9f45a" {...thin} />
+        </g>
+      );
     case "hat_witch_pink":
     case "hat_crescent": {
       const pink = id === "hat_witch_pink";
@@ -1561,6 +1599,32 @@ export function CompanionPart({ id, u }: { id: string; u: string }) {
           <path d="M0 -3 A3 3 0 1 0 2.2 2 A2.2 2.2 0 1 1 0 -3 Z" transform="translate(0 5)" fill="#f4d68e" />
         </g>
       );
+    case "pet_naan":
+      // A warm, slightly smug teardrop naan with blistered, charred bubbles.
+      return (
+        <g transform="rotate(-18)">
+          <path d="M -24 4 C -24 -8 -10 -15 4 -14 C 16 -13 24 -6 22 4 C 20 13 8 17 -4 16 C -16 15 -24 12 -24 4 Z" fill="#f3cf8e" {...ol} />
+          <path d="M -19 4 C -19 -5 -8 -10 4 -9 C 13 -8 18 -3 17 4 C 16 10 7 12 -3 12 C -12 11 -19 9 -19 4 Z" fill="#fbe2b4" />
+          {[[-15, -3, 3], [12, -7, 2.6], [15, 6, 2.4], [-12, 10, 2.2], [3, 12, 1.8], [-4, -10, 2]].map(([x, y, r], i) => (
+            <g key={i}>
+              <ellipse cx={x} cy={y} rx={r} ry={r * 0.75} fill="#fff1d6" stroke="#b5743a" strokeWidth={0.8} />
+              <ellipse cx={x + r * 0.3} cy={y + r * 0.25} rx={r * 0.45} ry={r * 0.32} fill="#8a5426" opacity={0.8} />
+            </g>
+          ))}
+          <g transform="rotate(18)">
+            {[-4.5, 4.5].map((x) => (
+              <g key={x}>
+                <circle cx={x} cy={0} r={2} fill="#3a2414" />
+                <circle cx={x - 0.7} cy={-0.8} r={0.7} fill="#fff" />
+              </g>
+            ))}
+            <path d="M -2.4 4 Q 0 6.4 2.4 4" stroke="#3a2414" strokeWidth={1} fill="none" strokeLinecap="round" />
+            <ellipse cx={-8} cy={4} rx={2} ry={1.2} fill="#ff9fa8" opacity={0.6} />
+            <ellipse cx={8} cy={4} rx={2} ry={1.2} fill="#ff9fa8" opacity={0.6} />
+            <path d="M -6 -18 Q -8 -22 -6 -26 M 0 -19 Q -2 -23 0 -27 M 6 -18 Q 4 -22 6 -26" stroke="#fff" strokeWidth={1.2} fill="none" opacity={0.75} strokeLinecap="round" />
+          </g>
+        </g>
+      );
     case "pet_pomeranian": {
       // A round orange fluffball with a plume tail and a tiny pink bow.
       const puff = (cx: number, cy: number, r: number, n: number) => {
@@ -2029,7 +2093,7 @@ export interface WitchProps {
 const EAR_L: Pt = [57, 110];
 const EAR_R: Pt = [143, 110];
 
-const HAT_IDS = new Set(["hat_sun_pink", "hat_witch_pink", "hat_pearl_crown", "hat_sun_straw", "hat_crescent", "hat_flower_crown", "hat_beanie_black", "hat_crystal_tiara", "hat_snow_pearl"]);
+const HAT_IDS = new Set(["hat_padel_visor", "hat_sun_pink", "hat_witch_pink", "hat_pearl_crown", "hat_sun_straw", "hat_crescent", "hat_flower_crown", "hat_beanie_black", "hat_crystal_tiara", "hat_snow_pearl"]);
 
 export function Witch({ characterId, look, equipped, mood, size = 220, animate = true, action = null, className, title, petName }: WitchProps) {
   const u = safeId(useId());
@@ -2293,6 +2357,19 @@ export function Witch({ characterId, look, equipped, mood, size = 220, animate =
                   <path d={`M 65 ${b.sY + 44} Q 69 ${b.sY + 38} 74 ${b.sY + 42}`} stroke="#fff" strokeWidth={0.9} fill="none" opacity={0.8} />
                   <ellipse cx={66.5} cy={b.sY + 38.5} rx={2.4} ry={1.5} fill="#fff" opacity={0.9} transform={`rotate(-30 66.5 ${b.sY + 38.5})`} />
                   <path d={SPARKLE_D} transform={`translate(58 ${b.sY + 32}) scale(0.4)`} fill="#f4d68e" />
+                </g>
+              )}
+              {characterId === "christiana" && !offended && (
+                <g transform={`translate(66 ${b.sY + 30}) rotate(-24)`}>
+                  <rect x={-2.2} y={8} width={4.4} height={20} rx={2} fill="#2b2b3a" {...thin} />
+                  <rect x={-2.6} y={22} width={5.2} height={7} rx={1.6} fill="#ff7fbf" {...thin} />
+                  <path d="M 0 -26 C 13 -26 16 -12 15 -2 C 14 8 7 12 0 12 C -7 12 -14 8 -15 -2 C -16 -12 -13 -26 0 -26 Z" fill="#ff8fc8" {...ol} />
+                  <path d="M 0 -22 C 10 -22 12 -11 11 -3 C 10 5 5 8 0 8 C -5 8 -10 5 -11 -3 C -12 -11 -10 -22 0 -22 Z" fill="#ffd3e8" />
+                  {[[-5, -14], [0, -16], [5, -14], [-6, -7], [0, -9], [6, -7], [-5, 0], [0, -2], [5, 0]].map(([x, y], i) => (
+                    <circle key={i} cx={x} cy={y} r={1.1} fill="#e0609f" />
+                  ))}
+                  <circle cx={18} cy={14} r={4.2} fill="#d9f45a" {...thin} />
+                  <path d="M 14.5 12.5 Q 18 15.5 21.5 12.5" stroke="#fff" strokeWidth={0.9} fill="none" />
                 </g>
               )}
               <MoodFx mood={sleeping ? "sleepy" : mood} b={b} />
