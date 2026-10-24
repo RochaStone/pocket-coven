@@ -251,3 +251,19 @@ describe("family accounts", () => {
     await expectFail(rpc(pool, mum, "claim_invite", [await serviceInvite(pool, "veda")]), "already_has_character");
   });
 });
+
+describe("family release", () => {
+  it("releasing one witch from a family login keeps the parent in the coven", async () => {
+    const parent = await makeUser(pool, "family-release@example.com");
+    const token = await serviceInvite(pool, "cheryl");
+    await sql("update public.invitations set bundle = '{veda}' where character_id = 'cheryl' and claimed_at is null");
+    await rpc(pool, parent, "claim_invite", [token]);
+    await rpc(pool, rocha, "admin_release_character", ["veda"]);
+    const { rows } = await sql("select count(*)::int n from public.coven_members where user_id = $1", [parent]);
+    expect(rows[0].n).toBe(1);
+    expect((await rpc(pool, parent, "get_my_state")).family.map((f: any) => f.id)).toEqual(["cheryl"]);
+    await rpc(pool, rocha, "admin_release_character", ["cheryl"]);
+    const after = await sql("select count(*)::int n from public.coven_members where user_id = $1", [parent]);
+    expect(after.rows[0].n).toBe(0);
+  });
+});
