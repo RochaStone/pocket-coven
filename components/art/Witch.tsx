@@ -32,6 +32,9 @@ export const BUILDS: Record<CharacterId, Build> = {
   dray: { ...ADULT, sh: 23 },
   cheryl: { ...ADULT },
   veda: { ...ADULT, sh: 21.5, wa: 15 },
+  christiana: { ...ADULT, sh: 21.5 },
+  // LaLa is a child: shorter, slighter, a touch more head.
+  layla: { sh: 16, wa: 13.5, hip: 15, sY: 142, waistY: 170, hipY: 178, footY: 222, legX: 6, armW: 7, corner: 8, andro: false, baby: false, headScale: 1.06 },
 };
 
 export const DEFAULT_BUILD = ADULT;
@@ -469,6 +472,95 @@ const OUTFITS: Record<string, OutfitDef> = {
       };
     },
   },
+  outfit_fairy_tutu: {
+    sleeve: "tee",
+    sleeveFill: "#fff0f7",
+    shoes: "sneakers",
+    shoeColor: "#ff7fbf",
+    leggings: "#ffc6df",
+    draw: ({ b, u, mode }) => {
+      const hemY = mode === "tail" ? b.waistY + 5 : b.waistY + 17;
+      const hemW = mode === "tail" ? b.wa + 8 : b.hip + 11;
+      return {
+        lower: (
+          <g>
+            <defs>
+              <Grad id={`${u}-tutu`} stops={[[0, "#ff9ccb"], [1, "#ff6fb4"]]} />
+            </defs>
+            <path d={skirtD(b.waistY - 2, b.wa + 1, hemY + 2, hemW + 2, 8, 3)} fill="#ffd3e8" {...ol} />
+            <path d={skirtD(b.waistY - 2, b.wa + 1, hemY - 1, hemW, 8, 3)} fill={`url(#${u}-tutu)`} {...ol} />
+            <rect x={100 - b.wa - 1.5} y={b.waistY - 4} width={(b.wa + 1.5) * 2} height={4.5} rx={2} fill="#ff7fbf" {...thin} />
+            <Glitter pts={[[100 - hemW + 8, hemY - 6], [94, b.waistY + 6], [107, b.waistY + 9], [100 + hemW - 7, hemY - 5]]} />
+          </g>
+        ),
+        upper: (
+          <g>
+            <path d={garmentD(b, b.sY, b.waistY, b.wa)} fill="#fff0f7" {...ol} />
+            <path d={`M ${100 - 6} ${b.sY} Q 100 ${b.sY + 5} ${100 + 6} ${b.sY}`} fill="none" {...thin} />
+            <path d={HEART_D} transform={`translate(100 ${b.sY + 15}) scale(1.1)`} fill="#ff7fbf" {...thin} />
+          </g>
+        ),
+      };
+    },
+  },
+  outfit_padel_set: {
+    sleeve: "cap",
+    sleeveFill: "#ffffff",
+    shoes: "sneakers",
+    shoeColor: "#ffffff",
+    draw: ({ b, mode }) => {
+      const hemY = mode === "tail" ? b.waistY + 5 : b.waistY + 22;
+      const hemW = mode === "tail" ? b.wa + 7 : b.hip + 7;
+      const pleats = [-0.6, -0.2, 0.2, 0.6].map((t) => 100 + t * hemW);
+      return {
+        lower: (
+          <g>
+            <path d={`M ${100 - b.wa - 1} ${b.waistY - 2} L ${100 + b.wa + 1} ${b.waistY - 2} L ${100 + hemW} ${hemY} L ${100 - hemW} ${hemY} Z`} fill="#ff8fc8" {...ol} />
+            <path d={pleats.map((x) => `M ${f(100 + (x - 100) * 0.55)} ${b.waistY + 1} L ${f(x)} ${hemY - 1}`).join(" ")} stroke="#e0609f" strokeWidth={1} fill="none" />
+            <rect x={100 - b.wa - 1.5} y={b.waistY - 4} width={(b.wa + 1.5) * 2} height={4} rx={2} fill="#ffffff" {...thin} />
+          </g>
+        ),
+        upper: (
+          <g>
+            <path d={garmentD(b, b.sY, b.waistY, b.wa)} fill="#ffffff" {...ol} />
+            <path d={`M ${100 - 8} ${b.sY} L 100 ${b.sY + 9} L ${100 + 8} ${b.sY} M 100 ${b.sY + 9} L 100 ${b.sY + 16}`} stroke="#ff7fbf" strokeWidth={1.4} fill="none" strokeLinejoin="round" />
+            <path d={`M ${100 - 9} ${b.sY - 1} L ${100 - 3} ${b.sY + 6} L ${100 - 11} ${b.sY + 4} Z M ${100 + 9} ${b.sY - 1} L ${100 + 3} ${b.sY + 6} L ${100 + 11} ${b.sY + 4} Z`} fill="#ffe3f1" {...thin} />
+            <path d={`M ${100 - b.sh + 4} ${b.sY + 22} L ${100 - b.wa} ${b.waistY - 4} M ${100 + b.sh - 4} ${b.sY + 22} L ${100 + b.wa} ${b.waistY - 4}`} stroke="#ff8fc8" strokeWidth={2} />
+            <circle cx={100 + 8} cy={b.sY + 18} r={2.6} fill="#d9f45a" {...thin} />
+          </g>
+        ),
+      };
+    },
+  },
+  outfit_rose_wrap: {
+    sleeve: "flutter",
+    sleeveFill: "#eaa7b3",
+    shoes: "sandals",
+    shoeColor: "#c98a6a",
+    draw: ({ b, u, mode }) => {
+      const hemY = mode === "tail" ? b.waistY + 6 : b.waistY + 44;
+      const hemW = mode === "tail" ? b.wa + 7 : b.hip + 8;
+      return {
+        lower: (
+          <g>
+            <defs>
+              <Grad id={`${u}-rose`} stops={[[0, "#eaa7b3"], [1, "#d98394"]]} />
+            </defs>
+            <path d={skirtD(b.waistY - 1, b.wa, hemY, hemW, 6, 3)} fill={`url(#${u}-rose)`} {...ol} />
+            <path d={`M ${100 + 4} ${b.waistY + 1} Q ${100 + 8} ${(b.waistY + hemY) / 2} ${100 + hemW - 6} ${hemY - 2}`} stroke="#c9707f" strokeWidth={1.1} fill="none" opacity={0.7} />
+          </g>
+        ),
+        upper: (
+          <g>
+            <path d={garmentD(b, b.sY + 1, b.waistY, b.wa)} fill="#eaa7b3" {...ol} />
+            <path d={`M ${100 - b.sh + 7} ${b.sY + 1} L ${100 + 5} ${b.waistY - 3} M ${100 + b.sh - 7} ${b.sY + 1} L ${100 - 2} ${b.sY + 18}`} stroke="#c9707f" strokeWidth={1.3} fill="none" />
+            <rect x={100 - b.wa - 1} y={b.waistY - 4} width={(b.wa + 1) * 2} height={4.5} rx={2} fill="#c9707f" {...thin} />
+            <circle cx={100 + b.wa - 3} cy={b.waistY - 1.8} r={2.4} fill="#f6d3d9" {...thin} />
+          </g>
+        ),
+      };
+    },
+  },
 };
 
 function defaultOutfit(id: CharacterId): OutfitDef {
@@ -890,6 +982,23 @@ const HAIR: Record<HairStyle, HairShape> = {
     ),
     shine: "M 68 60 Q 100 44 132 60",
   },
+  pigtails: {
+    // Two bunches tied high at the sides, drawn behind the head.
+    back: "M 56 78 C 32 84 22 116 26 146 C 28 164 38 176 46 172 C 41 162 47 152 45 138 C 43 118 50 100 62 90 Z" + " " + mirrorD("M 56 78 C 32 84 22 116 26 146 C 28 164 38 176 46 172 C 41 162 47 152 45 138 C 43 118 50 100 62 90 Z"),
+    strands: "M 36 110 C 30 128 36 146 34 160 M 164 110 C 170 128 164 146 166 160",
+    cap: "M 47 118 C 40 70 66 36 100 36 C 134 36 160 70 153 118 L 145 116 C 145 98 142 86 138 78" + fringe([[138, 78], [134, 95], [126, 74], [116, 91], [108, 72], [99, 93], [90, 72], [82, 90], [74, 74], [66, 94], [62, 80]]) + " C 58 88 55 100 55 116 Z",
+    extra: () => (
+      <g>
+        {[56, 144].map((x) => (
+          <g key={x}>
+            <circle cx={x} cy={80} r={6} fill="#ff7fbf" stroke={OUTLINE} strokeWidth={1.4} />
+            <circle cx={x - 1.8} cy={78} r={1.6} fill="#fff" opacity={0.85} />
+          </g>
+        ))}
+      </g>
+    ),
+    shine: "M 68 60 Q 100 44 132 60",
+  },
 };
 
 type Curl = [number, number, number];
@@ -966,6 +1075,15 @@ function HairFront({ style, p, u, sp, curly }: { style: HairStyle; p: HairPalett
 /** Hats are drawn with the origin at the crown of the head (100, 40 in avatar space). */
 export function HatPart({ id, u }: { id: string; u: string }) {
   switch (id) {
+    case "hat_padel_visor":
+      return (
+        <g>
+          <path d="M -50 30 C -46 12 -24 6 0 6 C 24 6 46 12 50 30 L 44 31 C 40 18 22 13 0 13 C -22 13 -40 18 -44 31 Z" fill="#ffffff" {...ol} />
+          <path d="M -40 30 C -30 46 30 46 40 30 C 26 36 -26 36 -40 30 Z" fill="#ff7fbf" {...ol} />
+          <path d="M -30 36 C -14 41 14 41 30 36" stroke="#fff" strokeWidth={1.4} fill="none" opacity={0.6} strokeLinecap="round" />
+          <circle cx={0} cy={10} r={3.2} fill="#d9f45a" {...thin} />
+        </g>
+      );
     case "hat_witch_pink":
     case "hat_crescent": {
       const pink = id === "hat_witch_pink";
@@ -1481,6 +1599,76 @@ export function CompanionPart({ id, u }: { id: string; u: string }) {
           <path d="M0 -3 A3 3 0 1 0 2.2 2 A2.2 2.2 0 1 1 0 -3 Z" transform="translate(0 5)" fill="#f4d68e" />
         </g>
       );
+    case "pet_naan":
+      // A warm, slightly smug teardrop naan with blistered, charred bubbles.
+      return (
+        <g transform="rotate(-18)">
+          <path d="M -24 4 C -24 -8 -10 -15 4 -14 C 16 -13 24 -6 22 4 C 20 13 8 17 -4 16 C -16 15 -24 12 -24 4 Z" fill="#f3cf8e" {...ol} />
+          <path d="M -19 4 C -19 -5 -8 -10 4 -9 C 13 -8 18 -3 17 4 C 16 10 7 12 -3 12 C -12 11 -19 9 -19 4 Z" fill="#fbe2b4" />
+          {[[-15, -3, 3], [12, -7, 2.6], [15, 6, 2.4], [-12, 10, 2.2], [3, 12, 1.8], [-4, -10, 2]].map(([x, y, r], i) => (
+            <g key={i}>
+              <ellipse cx={x} cy={y} rx={r} ry={r * 0.75} fill="#fff1d6" stroke="#b5743a" strokeWidth={0.8} />
+              <ellipse cx={x + r * 0.3} cy={y + r * 0.25} rx={r * 0.45} ry={r * 0.32} fill="#8a5426" opacity={0.8} />
+            </g>
+          ))}
+          <g transform="rotate(18)">
+            {[-4.5, 4.5].map((x) => (
+              <g key={x}>
+                <circle cx={x} cy={0} r={2} fill="#3a2414" />
+                <circle cx={x - 0.7} cy={-0.8} r={0.7} fill="#fff" />
+              </g>
+            ))}
+            <path d="M -2.4 4 Q 0 6.4 2.4 4" stroke="#3a2414" strokeWidth={1} fill="none" strokeLinecap="round" />
+            <ellipse cx={-8} cy={4} rx={2} ry={1.2} fill="#ff9fa8" opacity={0.6} />
+            <ellipse cx={8} cy={4} rx={2} ry={1.2} fill="#ff9fa8" opacity={0.6} />
+            <path d="M -6 -18 Q -8 -22 -6 -26 M 0 -19 Q -2 -23 0 -27 M 6 -18 Q 4 -22 6 -26" stroke="#fff" strokeWidth={1.2} fill="none" opacity={0.75} strokeLinecap="round" />
+          </g>
+        </g>
+      );
+    case "pet_pomeranian": {
+      // A round orange fluffball with a plume tail and a tiny pink bow.
+      const puff = (cx: number, cy: number, r: number, n: number) => {
+        let d = "";
+        for (let i = 0; i <= n; i++) {
+          const a = (i / n) * Math.PI * 2;
+          const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r;
+          if (i === 0) d = `M ${f(x)} ${f(y)}`;
+          else {
+            const m = a - Math.PI / n;
+            d += ` Q ${f(cx + Math.cos(m) * r * 1.22)} ${f(cy + Math.sin(m) * r * 1.22)} ${f(x)} ${f(y)}`;
+          }
+        }
+        return d + " Z";
+      };
+      return (
+        <g>
+          <path d={puff(12, 2, 8, 9)} fill="#ffcf8a" {...thin} />
+          <path d={puff(0, 9, 12, 12)} fill="#f4a64a" {...ol} />
+          <ellipse cx={-5} cy={19} rx={3.2} ry={2} fill="#f4a64a" {...thin} />
+          <ellipse cx={5} cy={19} rx={3.2} ry={2} fill="#f4a64a" {...thin} />
+          <path d={puff(0, -6, 13, 14)} fill="#ffd9a3" {...ol} />
+          <path d="M -9 -13 L -11 -24 L -3 -18 Z M 9 -13 L 11 -24 L 3 -18 Z" fill="#f4a64a" {...ol} />
+          <path d="M -8.5 -16 L -9.5 -21 L -5.5 -18 Z M 8.5 -16 L 9.5 -21 L 5.5 -18 Z" fill="#ffc2d8" />
+          <ellipse cx={0} cy={-7} rx={10} ry={9} fill="#f7b45e" stroke={OUTLINE} strokeWidth={1.2} />
+          <ellipse cx={0} cy={-3} rx={5.5} ry={4.2} fill="#fff1dc" />
+          {[-4.2, 4.2].map((x) => (
+            <g key={x}>
+              <circle cx={x} cy={-9} r={2.3} fill="#2a1c14" />
+              <circle cx={x - 0.8} cy={-10} r={0.8} fill="#fff" />
+            </g>
+          ))}
+          <ellipse cx={0} cy={-5} rx={1.6} ry={1.1} fill="#2a1c14" />
+          <path d="M -1.8 -3.4 Q 0 -2 0 -4 Q 0 -2 1.8 -3.4" stroke={OUTLINE} strokeWidth={0.7} fill="none" />
+          <path d="M -1 -2.6 Q 0 0.6 1 -2.6 Z" fill="#ff8fb4" />
+          <ellipse cx={-7.5} cy={-4.5} rx={1.8} ry={1.1} fill="#ff9fc4" opacity={0.6} />
+          <ellipse cx={7.5} cy={-4.5} rx={1.8} ry={1.1} fill="#ff9fc4" opacity={0.6} />
+          <g transform="translate(8 -15) rotate(18)">
+            <path d="M0 0 C -2 -3 -6 -3 -5.5 0 C -6 3 -2 3 0 0 Z M0 0 C 2 -3 6 -3 5.5 0 C 6 3 2 3 0 0 Z" fill="#ff7fbf" {...thin} />
+            <circle r={1.2} fill="#ffd3e8" />
+          </g>
+        </g>
+      );
+    }
     case "pet_white_kitten": {
       let fluff = "M -12 18";
       const pts: [number, number][] = [[-14, 10], [-13, 2], [-9, -2], [0, -3], [9, -2], [13, 2], [14, 10], [12, 18]];
@@ -1860,6 +2048,7 @@ const CSS = `
   .pcw-anim .pcw-sway { animation: pcwSway 4.2s ease-in-out infinite; }
   .pcw-anim .pcw-fin { animation: pcwFin 2.8s ease-in-out infinite; }
   .pcw-anim .pcw-pet { animation: pcwPet 2.9s ease-in-out infinite; }
+  .pcw-anim .pcw-wing { animation: pcwWing 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: 0% 60%; }
   .pcw-anim .pcw-float-soft { animation: pcwBob 2.6s ease-in-out infinite; }
   .pcw-anim .pcw-float { animation: pcwFloat 3.2s ease-in-out infinite; }
   .pcw-anim .pcw-orbit { animation: pcwOrbit 14s linear infinite; }
@@ -1873,6 +2062,7 @@ const CSS = `
 @keyframes pcwBlink { 0%,90%,100% { transform: scaleY(1); } 93% { transform: scaleY(0.08); } 96% { transform: scaleY(1); } }
 @keyframes pcwSway { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2.5deg); } }
 @keyframes pcwFin { 0%,100% { transform: rotate(-7deg); } 50% { transform: rotate(8deg); } }
+@keyframes pcwWing { 0%,100% { transform: rotate(0deg) scaleX(1); } 50% { transform: rotate(-6deg) scaleX(0.9); } }
 @keyframes pcwPet { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-6px) rotate(3deg); } }
 @keyframes pcwFloat { 0% { transform: translateY(4px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(-12px); opacity: 0; } }
 @keyframes pcwOrbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -1888,6 +2078,7 @@ const CSS = `
 /* ------------------------------------------------------------------ */
 
 export interface WitchProps {
+  petName?: string;
   characterId: CharacterId;
   look: Look;
   equipped: Equipped;
@@ -1902,9 +2093,9 @@ export interface WitchProps {
 const EAR_L: Pt = [57, 110];
 const EAR_R: Pt = [143, 110];
 
-const HAT_IDS = new Set(["hat_sun_pink", "hat_witch_pink", "hat_pearl_crown", "hat_sun_straw", "hat_crescent", "hat_flower_crown", "hat_beanie_black", "hat_crystal_tiara", "hat_snow_pearl"]);
+const HAT_IDS = new Set(["hat_padel_visor", "hat_sun_pink", "hat_witch_pink", "hat_pearl_crown", "hat_sun_straw", "hat_crescent", "hat_flower_crown", "hat_beanie_black", "hat_crystal_tiara", "hat_snow_pearl"]);
 
-export function Witch({ characterId, look, equipped, mood, size = 220, animate = true, action = null, className, title }: WitchProps) {
+export function Witch({ characterId, look, equipped, mood, size = 220, animate = true, action = null, className, title, petName }: WitchProps) {
   const u = safeId(useId());
   const b = BUILDS[characterId] ?? ADULT;
   const hp = hairPalette(look.hairColor);
@@ -1998,6 +2189,23 @@ export function Witch({ characterId, look, equipped, mood, size = 220, animate =
         <g transform={tilt}>
           <g className={action === "dance" ? "pcw-dance" : undefined} style={{ transformBox: "fill-box", transformOrigin: "50% 100%" } as CSSProperties}>
             <g className="pcw-bob">
+              {characterId === "layla" && !offended && (
+                <g>
+                  <defs>
+                    <Grad id={`${u}-wing`} stops={[[0, "#ffffff", 0.95], [0.45, "#ffb3da", 0.92], [1, "#c9a6ff", 0.92]]} x2={1} y2={1} />
+                  </defs>
+                  {[1, -1].map((s) => (
+                    <g key={s} transform={s === -1 ? mirror : undefined}>
+                      <g className="pcw-wing" style={{ animationDelay: s === 1 ? "0s" : "0.05s" }}>
+                        <path d={`M 104 ${b.sY + 6} C 126 ${b.sY - 30} 176 ${b.sY - 34} 178 ${b.sY - 8} C 180 ${b.sY + 12} 150 ${b.sY + 20} 106 ${b.sY + 16} Z`} fill={`url(#${u}-wing)`} stroke="#e58bbd" strokeWidth={1.4} strokeLinejoin="round" />
+                        <path d={`M 106 ${b.sY + 18} C 140 ${b.sY + 16} 164 ${b.sY + 34} 156 ${b.sY + 54} C 148 ${b.sY + 66} 120 ${b.sY + 46} 106 ${b.sY + 24} Z`} fill={`url(#${u}-wing)`} stroke="#e58bbd" strokeWidth={1.4} strokeLinejoin="round" />
+                        <path d={`M 108 ${b.sY + 10} C 130 ${b.sY - 8} 152 ${b.sY - 18} 170 ${b.sY - 14} M 110 ${b.sY + 22} C 128 ${b.sY + 28} 142 ${b.sY + 38} 150 ${b.sY + 50}`} stroke="#f7a8cf" strokeWidth={1} fill="none" opacity={0.8} />
+                        <Glitter pts={[[166, b.sY - 18], [150, b.sY + 2], [140, b.sY + 40]]} color="#fff" />
+                      </g>
+                    </g>
+                  ))}
+                </g>
+              )}
               {/* back hair */}
               <g transform={headT}>
                 {buns && HAIR.space_buns.extra?.(hp, u)}
@@ -2151,6 +2359,19 @@ export function Witch({ characterId, look, equipped, mood, size = 220, animate =
                   <path d={SPARKLE_D} transform={`translate(58 ${b.sY + 32}) scale(0.4)`} fill="#f4d68e" />
                 </g>
               )}
+              {characterId === "christiana" && !offended && (
+                <g transform={`translate(66 ${b.sY + 30}) rotate(-24)`}>
+                  <rect x={-2.2} y={8} width={4.4} height={20} rx={2} fill="#2b2b3a" {...thin} />
+                  <rect x={-2.6} y={22} width={5.2} height={7} rx={1.6} fill="#ff7fbf" {...thin} />
+                  <path d="M 0 -26 C 13 -26 16 -12 15 -2 C 14 8 7 12 0 12 C -7 12 -14 8 -15 -2 C -16 -12 -13 -26 0 -26 Z" fill="#ff8fc8" {...ol} />
+                  <path d="M 0 -22 C 10 -22 12 -11 11 -3 C 10 5 5 8 0 8 C -5 8 -10 5 -11 -3 C -12 -11 -10 -22 0 -22 Z" fill="#ffd3e8" />
+                  {[[-5, -14], [0, -16], [5, -14], [-6, -7], [0, -9], [6, -7], [-5, 0], [0, -2], [5, 0]].map(([x, y], i) => (
+                    <circle key={i} cx={x} cy={y} r={1.1} fill="#e0609f" />
+                  ))}
+                  <circle cx={18} cy={14} r={4.2} fill="#d9f45a" {...thin} />
+                  <path d="M 14.5 12.5 Q 18 15.5 21.5 12.5" stroke="#fff" strokeWidth={0.9} fill="none" />
+                </g>
+              )}
               <MoodFx mood={sleeping ? "sleepy" : mood} b={b} />
             </g>
           </g>
@@ -2160,10 +2381,16 @@ export function Witch({ characterId, look, equipped, mood, size = 220, animate =
       {offended && <ShellFront u={u} />}
 
       {equipped.companion && (
-        <g transform={equipped.companion === "pet_black_cat" || equipped.companion === "pet_white_kitten" ? `translate(${offended ? 178 : 170} ${offended ? 194 : b.footY - 18})` : "translate(176 150)"}>
+        <g transform={equipped.companion === "pet_black_cat" || equipped.companion === "pet_white_kitten" || equipped.companion === "pet_pomeranian" ? `translate(${offended ? 178 : 170} ${offended ? 194 : b.footY - 18})` : "translate(176 150)"}>
           <g className="pcw-pet" style={{ animationDelay: `${(hash % 13) / 10}s` }}>
             <CompanionPart id={equipped.companion} u={u} />
           </g>
+          {petName && (
+            <g transform="translate(0 30)">
+              <rect x={-petName.length * 2.7 - 5} y={-6.5} width={petName.length * 5.4 + 10} height={12} rx={6} fill="#fff" stroke="#f7a8cf" strokeWidth={1} />
+              <text textAnchor="middle" y={3} fontSize={8.5} fontWeight={700} fill="#c2457f" fontFamily="inherit">{petName}</text>
+            </g>
+          )}
         </g>
       )}
     </svg>

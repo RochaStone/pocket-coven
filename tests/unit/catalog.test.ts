@@ -62,7 +62,7 @@ describe("catalog integrity", () => {
       expect(ACTIVITIES.find((a) => a.id === id)?.adultOnly, id).toBe(true);
     }
     expect(CHARACTERS.find((c) => c.id === "rocha")?.babyAesthetic).toBe(true);
-    expect(CHARACTERS.filter((c) => c.babyAesthetic)).toHaveLength(1);
+    expect(CHARACTERS.filter((c) => c.babyAesthetic).map((c) => c.id).sort()).toEqual(["layla", "rocha"]);
   });
 
   it("shared events reference real places and loot", () => {

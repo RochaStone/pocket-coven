@@ -32,6 +32,8 @@ export const api = {
   buy: (itemId: string, key = idem()) => call<{ ok: boolean; achievements: string[]; state: MyState }>("buy_item", { p_item_id: itemId, p_key: key }),
   equip: (slot: string, itemId: string | null) => call<{ ok: boolean; achievements: string[]; state: MyState }>("equip_item", { p_slot: slot, p_item_id: itemId }),
   setLook: (look: Record<string, unknown>) => call<MyState>("set_look", { p_look: look }),
+  switchCharacter: (id: string) => call<MyState>("switch_character", { p_char: id }),
+  namePet: (itemId: string, name: string) => call<MyState>("name_pet", { p_item_id: itemId, p_name: name }),
   updateProfile: (description: string | null, personality: string | null, pronouns: unknown) =>
     call<MyState>("update_my_profile", { p_description: description, p_personality: personality, p_pronouns: pronouns }),
   place: (itemId: string, col: number, row: number) => call<{ ok: boolean; achievements: string[]; state: MyState }>("place_decoration", { p_item_id: itemId, p_col: col, p_row: row }),

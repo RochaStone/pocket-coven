@@ -71,6 +71,33 @@ export const CHARACTERS: CharacterDef[] = [
     equipped: { outfit: "outfit_mist_gown", hat: "hat_crystal_tiara", necklace: "neck_crystal", earrings: "ear_pearl_drop", companion: "pet_white_kitten" },
     starterItems: ["outfit_mist_gown", "hat_crystal_tiara", "neck_crystal", "ear_pearl_drop", "tail_lavender_moon", "pet_white_kitten", "furn_shell_vanity", "decor_mushroom_lamp"],
   },
+  {
+    id: "christiana",
+    name: "Christiana",
+    title: "The Padel Queen",
+    pronouns: SHE,
+    babyAesthetic: false,
+    isOwnerCharacter: false,
+    description: "Long brown hair, padel whites, a visor and a racket always within reach. Never far from her little fairy or a warm naan.",
+    personality: "Queen of the padel court. Warm, steady, quietly fierce. Remembers everyone's favourite treat.",
+    look: { skin: "#ecc3a6", hairColor: "#6b4428", hairStyle: "straight_long", eyeColor: "#6b4a2e" },
+    equipped: { outfit: "outfit_padel_set", hat: "hat_padel_visor", earrings: "ear_pearl_drop", companion: "pet_naan" },
+    starterItems: ["outfit_padel_set", "hat_padel_visor", "pet_naan", "outfit_rose_wrap", "hat_flower_crown", "ear_pearl_drop", "neck_pearls", "tail_coral_sunset", "furn_coral_lamp", "decor_palm_pot"],
+  },
+  {
+    id: "layla",
+    name: "LaLa",
+    title: "The Pink Fairy",
+    pronouns: SHE,
+    // Child player: the baby flag also keeps every adults-only activity away from her.
+    babyAesthetic: true,
+    isOwnerCharacter: false,
+    description: "A pink fairy with long brown pigtails, shimmering wings, a twirly tutu and her fluffy Pomeranian puppy.",
+    personality: "Giggly, brave, pink about everything. Asks the best questions.",
+    look: { skin: "#ecc3a6", hairColor: "#6b4428", hairStyle: "pigtails", eyeColor: "#6b4a2e" },
+    equipped: { outfit: "outfit_fairy_tutu", companion: "pet_pomeranian" },
+    starterItems: ["outfit_fairy_tutu", "pet_pomeranian", "hat_witch_pink", "hair_bow_pink", "tail_pink_aqua", "furn_oyster_bed", "decor_starfish_garland"],
+  },
 ];
 
 const W = (id: string, name: string, category: ItemDef["category"], slot: ItemDef["slot"], price: number | undefined, rarity: ItemDef["rarity"], description: string): ItemDef => ({ id, name, category, slot, price, rarity, description });
@@ -87,6 +114,9 @@ export const ITEMS: ItemDef[] = [
   W("outfit_mist_gown", "Mist Gown", "outfit", "outfit", 150, "rare", "Lavender chiffon that drifts like sea fog."),
   W("outfit_kairos_active", "Kairos Activewear", "outfit", "outfit", 80, "common", "Matching set. Pilates-ready, brunch-approved."),
   W("outfit_shell_suit", "Shell Tailored Suit", "outfit", "outfit", 160, "rare", "Sharp pearl-grey suit with a scallop lapel pin."),
+  W("outfit_fairy_tutu", "Fairy Tutu", "outfit", "outfit", 70, "common", "Pink tutu, heart tee, leggings built for running about."),
+  W("outfit_rose_wrap", "Rose Wrap Dress", "outfit", "outfit", 110, "common", "Dusty rose, flutter sleeves, ties with a pearl button."),
+  W("outfit_padel_set", "Padel Whites", "outfit", "outfit", 110, "common", "Crisp polo, pink pleated skort. Built for the bandeja."),
   W("outfit_overalls", "Sea-Glass Overalls", "outfit", "outfit", 70, "common", "Washed denim with sea-glass buttons."),
   // Tails
   W("tail_pink_aqua", "Pink Aqua Tail", "tail", "tail", 100, "common", "Shimmers pink to aqua as you swim."),
@@ -100,6 +130,7 @@ export const ITEMS: ItemDef[] = [
   W("hat_sun_straw", "Straw Sun Hat", "hat", "hat", 60, "common", "Wide brim, wider attitude."),
   W("hat_crescent", "Crescent Hat", "hat", "hat", 110, "common", "Navy witch hat with a golden crescent."),
   W("hat_flower_crown", "Frangipani Crown", "hat", "hat", 80, "common", "Fresh from a Bali morning."),
+  W("hat_padel_visor", "Padel Visor", "hat", "hat", 50, "common", "White visor, pink brim. Sun out of the eyes, eyes on the ball."),
   W("hat_beanie_black", "Black Beanie", "hat", "hat", 40, "common", "Slouchy. Cool without trying. (Trying a bit.)"),
   W("hat_sun_pink", "Pink Sun Hat", "hat", "hat", 70, "common", "Huge, pink, bow on the band. Practical about shade, impractical about everything else."),
   W("hat_crystal_tiara", "Crystal Tiara", "hat", "hat", 170, "rare", "Quartz points that catch every light."),
@@ -127,6 +158,8 @@ export const ITEMS: ItemDef[] = [
   W("pet_black_cat", "Black Cat", "companion", "companion", 200, "rare", "Sleek, unbothered, protective. A classic for a reason."),
   W("pet_white_kitten", "White Kitten", "companion", "companion", 200, "rare", "Fluffy, gentle, occasionally prophetic."),
   W("pet_butterfly", "Violet Butterfly", "companion", "companion", 160, "common", "Flutters in moon-shaped loops."),
+  W("pet_pomeranian", "Pomeranian Puppy", "companion", "companion", 200, "rare", "An orange fluffball with a plume tail. Answers to whatever you name her."),
+  W("pet_naan", "Naan Bread", "companion", "companion", 120, "common", "Warm, golden, faintly smug. Floats beside you smelling incredible."),
   W("pet_moth_moon", "Luna Moth", "companion", "companion", 220, "rare", "Pale green wings, moon-drunk."),
   // Furniture
   P("furn_oyster_bed", "Oyster Bed", "furniture", 150, "rare", "A clam bed with a pearl pillow."),

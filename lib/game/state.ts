@@ -18,6 +18,7 @@ export interface WitchPublic {
     baby_aesthetic: boolean;
     look: Look;
     claimed: boolean;
+    pet_names?: Record<string, string>;
   };
   stats: Stats & { level: number; updated_at: string };
   mood: Mood;
@@ -40,6 +41,7 @@ export interface MyState extends WitchPublic {
   push_enabled: boolean;
   moon: { phase: number; window: "full" | "new" | null };
   month: number;
+  family?: { id: string; name: string; title: string }[];
 }
 
 export interface Gift {
