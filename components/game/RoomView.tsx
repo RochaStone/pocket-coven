@@ -94,7 +94,7 @@ function VisitRoom({ host }: { host: string }) {
             <RoomBackdrop wallpaper={witch.room.wallpaper} floor={witch.room.floor}>
               <RoomGrid decorations={witch.decorations} />
               <div className="pointer-events-none absolute bottom-[6%] left-1/2 -translate-x-1/2" style={{ zIndex: 20 }}>
-                <Witch characterId={witch.character.id as never} look={witch.character.look} equipped={witch.equipment} mood={witch.mood} size={150} />
+                <Witch characterId={witch.character.id as never} look={witch.character.look} equipped={witch.equipment} mood={witch.mood} size={150} petName={witch.equipment.companion ? witch.character.pet_names?.[witch.equipment.companion] : undefined} />
               </div>
             </RoomBackdrop>
           </div>
@@ -164,7 +164,7 @@ function MyRoom() {
             <RoomGrid decorations={state.decorations} onCell={editing ? onCell : undefined} selected={moving} />
             {!editing && (
               <div className="pointer-events-none absolute bottom-[6%] left-1/2 -translate-x-1/2" style={{ zIndex: 20 }}>
-                <Witch characterId={state.character.id as never} look={state.character.look} equipped={state.equipment} mood={state.mood} size={150} />
+                <Witch characterId={state.character.id as never} look={state.character.look} equipped={state.equipment} mood={state.mood} size={150} petName={state.equipment.companion ? state.character.pet_names?.[state.equipment.companion] : undefined} />
               </div>
             )}
           </RoomBackdrop>

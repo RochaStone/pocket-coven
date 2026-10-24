@@ -26,7 +26,7 @@ const SKIN_SWATCHES = ["#fde3d4", "#f9d6c3", "#f0c4a4", "#e6b591", "#c48c69", "#
 const EYE_SWATCHES = ["#8a4fe0", "#38a89d", "#b49bff", "#2e9cb4", "#7fd9d2", "#6b3f2a", "#3b6fd1", "#d0558f"];
 const HAIR_LABEL: Record<string, string> = {
   long_waves: "Long waves", short_undercut: "Undercut", straight_long: "Sleek long", beach_waves: "Beach waves",
-  ethereal_long: "Ethereal", pixie: "Pixie", space_buns: "Space buns",
+  ethereal_long: "Ethereal", pixie: "Pixie", space_buns: "Space buns", pigtails: "Pigtails",
 };
 
 export function Wardrobe() {
@@ -78,7 +78,7 @@ export function Wardrobe() {
         <div className="relative flex flex-col items-center pt-3">
           <AnimatePresence>
             <motion.div key={flash} initial={{ scale: flash ? 0.9 : 1, rotate: flash ? -3 : 0 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 300, damping: 12 }}>
-              <Witch characterId={state.character.id as never} look={state.character.look} equipped={preview} mood={tryOn ? "magical" : state.mood} size={230} />
+              <Witch characterId={state.character.id as never} look={state.character.look} equipped={preview} mood={tryOn ? "magical" : state.mood} size={230} petName={preview.companion ? state.character.pet_names?.[preview.companion] : undefined} />
             </motion.div>
           </AnimatePresence>
           {tryOn && (
@@ -141,9 +141,36 @@ export function Wardrobe() {
           </section>
         ))}
 
+      {tab === "companion" && state.equipment.companion && <PetNamer key={state.equipment.companion} itemId={state.equipment.companion} />}
       {tab === "look" && <LookEditor />}
       {tab === "profile" && <ProfileEditor />}
     </div>
+  );
+}
+
+function PetNamer({ itemId }: { itemId: string }) {
+  const { state, setState, fail, toast } = useGame();
+  const saved = state.character.pet_names?.[itemId] ?? "";
+  const [name, setName] = useState(saved);
+  const pet = ITEMS.find((i) => i.id === itemId)?.name ?? "familiar";
+  const save = async () => {
+    try {
+      setState(await api.namePet(itemId, name));
+      toast({ tone: "flavour", text: name.trim() ? `Say hello to ${name.trim()}.` : `Your ${pet} is nameless again. Mysterious.` });
+    } catch (e) {
+      fail(e);
+    }
+  };
+  return (
+    <section className="pearl-panel space-y-2 p-4">
+      <label className="block">
+        <span className="mb-1 block text-xs font-bold text-ink/60">Name your {pet}</span>
+        <input value={name} onChange={(e) => setName(e.target.value.slice(0, 16))} maxLength={16} placeholder="A very good name" className="w-full rounded-2xl border-2 border-shell-100 bg-white p-2 text-[16px]" />
+      </label>
+      <button className="pearl-button" onClick={save} disabled={name.trim() === saved}>
+        {saved ? "Rename" : "Name"}
+      </button>
+    </section>
   );
 }
 

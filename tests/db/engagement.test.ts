@@ -198,3 +198,24 @@ describe("owner activity view", () => {
     expect(l.gifts_sent_7d).toBeGreaterThan(0);
   });
 });
+
+describe("pet names", () => {
+  it("a witch names a familiar she owns, friends see it, and junk names are refused", async () => {
+    await sql("select game.grant_item('lizz', 'pet_pomeranian', 1)");
+    const named = await rpc(pool, lizz, "name_pet", ["pet_pomeranian", "  Biscuit  "]);
+    expect(named.character.pet_names).toEqual({ pet_pomeranian: "Biscuit" });
+    const visit = await rpc(pool, dray, "visit_room", ["lizz"]);
+    expect(visit.host.character.pet_names.pet_pomeranian).toBe("Biscuit");
+    await expectFail(rpc(pool, lizz, "name_pet", ["pet_pomeranian", "<script>"]), "bad_name");
+    await expectFail(rpc(pool, lizz, "name_pet", ["pet_pomeranian", "x".repeat(17)]), "bad_name");
+    await expectFail(rpc(pool, lizz, "name_pet", ["outfit_overalls", "Denim"]), "bad_pet");
+    await expectFail(rpc(pool, dray, "name_pet", ["pet_pomeranian", "Stolen"]), "not_owned");
+    const cleared = await rpc(pool, lizz, "name_pet", ["pet_pomeranian", ""]);
+    expect(cleared.character.pet_names).toEqual({});
+  });
+
+  it("pigtails is a hairstyle the server accepts", async () => {
+    const s = await rpc(pool, dray, "set_look", [{ hairStyle: "pigtails" }]);
+    expect(s.character.look.hairStyle).toBe("pigtails");
+  });
+});

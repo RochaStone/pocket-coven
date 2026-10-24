@@ -78,7 +78,7 @@ export const CHARACTERS: CharacterDef[] = [
     pronouns: SHE,
     babyAesthetic: false,
     isOwnerCharacter: false,
-    description: "Long brown hair, a dusty-rose wrap dress and a frangipani crown. Never far from her rosebud.",
+    description: "Long brown hair, a dusty-rose wrap dress and a frangipani crown. Never far from her little fairy.",
     personality: "Warm, steady, quietly magic. Remembers everyone's favourite treat.",
     look: { skin: "#ecc3a6", hairColor: "#6b4428", hairStyle: "straight_long", eyeColor: "#6b4a2e" },
     equipped: { outfit: "outfit_rose_wrap", hat: "hat_flower_crown", earrings: "ear_pearl_drop", necklace: "neck_pearls" },
@@ -86,17 +86,17 @@ export const CHARACTERS: CharacterDef[] = [
   },
   {
     id: "layla",
-    name: "Layla",
-    title: "The Rosebud Witch",
+    name: "LaLa",
+    title: "The Pink Fairy",
     pronouns: SHE,
     // Child player: the baby flag also keeps every adults-only activity away from her.
     babyAesthetic: true,
     isOwnerCharacter: false,
-    description: "Long brown pigtails with pink bobbles, a twirly pink tutu, leggings made for adventures.",
+    description: "A pink fairy with long brown pigtails, shimmering wings, a twirly tutu and her fluffy Pomeranian puppy.",
     personality: "Giggly, brave, pink about everything. Asks the best questions.",
     look: { skin: "#ecc3a6", hairColor: "#6b4428", hairStyle: "pigtails", eyeColor: "#6b4a2e" },
-    equipped: { outfit: "outfit_rosebud_tutu" },
-    starterItems: ["outfit_rosebud_tutu", "hat_witch_pink", "hair_bow_pink", "tail_pink_aqua", "furn_oyster_bed", "decor_starfish_garland"],
+    equipped: { outfit: "outfit_fairy_tutu", companion: "pet_pomeranian" },
+    starterItems: ["outfit_fairy_tutu", "pet_pomeranian", "hat_witch_pink", "hair_bow_pink", "tail_pink_aqua", "furn_oyster_bed", "decor_starfish_garland"],
   },
 ];
 
@@ -114,7 +114,7 @@ export const ITEMS: ItemDef[] = [
   W("outfit_mist_gown", "Mist Gown", "outfit", "outfit", 150, "rare", "Lavender chiffon that drifts like sea fog."),
   W("outfit_kairos_active", "Kairos Activewear", "outfit", "outfit", 80, "common", "Matching set. Pilates-ready, brunch-approved."),
   W("outfit_shell_suit", "Shell Tailored Suit", "outfit", "outfit", 160, "rare", "Sharp pearl-grey suit with a scallop lapel pin."),
-  W("outfit_rosebud_tutu", "Rosebud Tutu", "outfit", "outfit", 70, "common", "Pink tutu, heart tee, leggings built for running about."),
+  W("outfit_fairy_tutu", "Fairy Tutu", "outfit", "outfit", 70, "common", "Pink tutu, heart tee, leggings built for running about."),
   W("outfit_rose_wrap", "Rose Wrap Dress", "outfit", "outfit", 110, "common", "Dusty rose, flutter sleeves, ties with a pearl button."),
   W("outfit_overalls", "Sea-Glass Overalls", "outfit", "outfit", 70, "common", "Washed denim with sea-glass buttons."),
   // Tails
@@ -156,6 +156,7 @@ export const ITEMS: ItemDef[] = [
   W("pet_black_cat", "Black Cat", "companion", "companion", 200, "rare", "Sleek, unbothered, protective. A classic for a reason."),
   W("pet_white_kitten", "White Kitten", "companion", "companion", 200, "rare", "Fluffy, gentle, occasionally prophetic."),
   W("pet_butterfly", "Violet Butterfly", "companion", "companion", 160, "common", "Flutters in moon-shaped loops."),
+  W("pet_pomeranian", "Pomeranian Puppy", "companion", "companion", 200, "rare", "An orange fluffball with a plume tail. Answers to whatever you name her."),
   W("pet_moth_moon", "Luna Moth", "companion", "companion", 220, "rare", "Pale green wings, moon-drunk."),
   // Furniture
   P("furn_oyster_bed", "Oyster Bed", "furniture", 150, "rare", "A clam bed with a pearl pillow."),

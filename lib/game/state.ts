@@ -18,6 +18,7 @@ export interface WitchPublic {
     baby_aesthetic: boolean;
     look: Look;
     claimed: boolean;
+    pet_names?: Record<string, string>;
   };
   stats: Stats & { level: number; updated_at: string };
   mood: Mood;
